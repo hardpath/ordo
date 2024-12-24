@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.Configuration;
-using ordo.Models;
+using Ordo.Models;
 
-namespace ordo
+namespace Ordo
 {
-    internal class Program
+    class Program
     {
         static void Main(string[] args)
         {

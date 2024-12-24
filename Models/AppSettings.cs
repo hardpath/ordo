@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ordo.Models
+namespace Ordo.Models
 {
     internal class AppSettings
     {
