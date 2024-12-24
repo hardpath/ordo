@@ -7,4 +7,10 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="Api\" />
+    <Folder Include="Core\" />
+    <Folder Include="Utils\" />
+  </ItemGroup>
+
 </Project>
