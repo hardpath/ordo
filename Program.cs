@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Ordo.Api;
 using Ordo.Models;
 
 namespace Ordo
@@ -17,11 +18,11 @@ namespace Ordo
             var appSettings = new AppSettings();
             configuration.GetSection("AppSettings").Bind(appSettings);
 
-            // Test: Display loaded values
-            Console.WriteLine("Configuration Loaded:");
-            Console.WriteLine($"ClientId: {appSettings.ClientId}");
-            Console.WriteLine($"TenantId: {appSettings.TenantId}");
-            Console.WriteLine($"ClientSecret: {appSettings.ClientSecret}");
+            // Get an authenticated Graph client
+            var graphClient = GraphClientHelper.GetAuthenticatedGraphClient(appSettings);
+
+            // Test: Verify the Graph client was created successfully
+            Console.WriteLine("Authenticated Graph Client Created!");
         }
     }
 }
