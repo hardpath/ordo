@@ -87,3 +87,6 @@ AI-powered assistant for seamlessly organising tasks and scheduling them into yo
 - **Multi-Device Support**: Ensure seamless use across desktop and mobile platforms.
 
 ---
+
+## Documentation
+- [Requirements](docs/requirements.md): Detailed feature definitions and planning for Ordo.
