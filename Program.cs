@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Graph;
 using Ordo.Api;
 using Ordo.Models;
+using Ordo.Core;
 
 namespace Ordo
 {
@@ -11,8 +13,8 @@ namespace Ordo
             try {
                 // Load configuration
                 var configuration = new ConfigurationBuilder()
-                    .SetBasePath(AppContext.BaseDirectory) // Sets the base path for config.json
-                    .AddJsonFile("config.json", optional: true, reloadOnChange: true) // Adds config.json
+                    .SetBasePath(AppContext.BaseDirectory)
+                    .AddJsonFile("config.json", optional: true, reloadOnChange: true)
                     .Build();
 
                 // Bind the configuration to AppSettings
@@ -22,20 +24,28 @@ namespace Ordo
                 // Get an authenticated Graph client
                 var graphClient = GraphClientHelper.GetAuthenticatedGraphClient(appSettings);
 
-                // Test: Verify the Graph client was created successfully
-                Console.WriteLine("Authenticated Graph Client Created!");
-
-                // Fetch tasks from Microsoft ToDo
-                await GraphClientHelper.FetchTasksAsync(graphClient, "eoliver@hardpath.co.uk");
-
-                // Fetch calendar events
-                await GraphClientHelper.FetchCalendarEventsAsync(graphClient, "eoliver@hardpath.co.uk");
-
-
+                // Execute periodic tasks
+                await RunTasks(graphClient, appSettings);
             }
             catch (Exception ex) {
                 Console.WriteLine($"An error occurred: {ex.Message}");
             }
+        }
+
+        static async Task RunTasks(GraphServiceClient graphClient, AppSettings appSettings)
+        {
+            Console.WriteLine("Starting periodic tasks...");
+
+            // Synchronise tasks with Microsoft ToDo
+            await PeriodicTasks.SynchroniseTasksWithToDo(graphClient, appSettings);
+
+            // Validate task durations
+            await PeriodicTasks.ValidateTaskDurations(appSettings);
+
+            // Sync with Microsoft 365 Calendar
+            await PeriodicTasks.SyncWithCalendar(graphClient, appSettings);
+
+            Console.WriteLine("Periodic tasks completed successfully.");
         }
     }
 }
