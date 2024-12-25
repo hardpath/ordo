@@ -6,16 +6,16 @@ This roadmap outlines the development milestones for Ordo based on the latest re
 
 ## **Phase 1: Core Functionality**
 ### 1. Task Management
-- [ ] Fetch tasks from Microsoft ToDo grouped by Lists (projects).
-- [ ] Extract task details (Name, Due Date).
+- [x] Fetch tasks from Microsoft ToDo grouped by Lists (projects).
+- [x] Extract task details (Name, Due Date).
 - [ ] Manage task durations:
   - [ ] Store estimated durations in a configuration file (e.g., `durations.json`).
   - [ ] Allow user-defined durations via ChatGPT.
   - [ ] Use default durations for tasks without estimates.
 
 ### 2. Calendar Integration
-- [ ] Fetch existing events from Microsoft 365 Calendar:
-  - [ ] Extract event details (Title, Start DateTime, End DateTime).
+- [x] Fetch existing events from Microsoft 365 Calendar:
+  - [x] Extract event details (Title, Start DateTime, End DateTime).
   - [ ] Distinguish between Ordo-Created Events (suffix "[Ordo]") and User-Created Events.
 - [ ] Add events to the calendar based on scheduled tasks, avoiding conflicts.
 - [ ] Edit existing events created by Ordo to reflect task changes.
