@@ -54,5 +54,35 @@ namespace Ordo.Api
                 Console.WriteLine($"Error retrieving tasks: {ex.Message}");
             }
         }
+
+        public static async Task FetchCalendarEventsAsync(GraphServiceClient graphClient, string userId)
+        {
+            try {
+                // Retrieve events from the user's default calendar
+                var events = await graphClient.Users[userId].Calendar.Events.GetAsync();
+
+                if (events?.Value == null || events.Value.Count == 0) {
+                    Console.WriteLine("No calendar events found.");
+                    return;
+                }
+
+                Console.WriteLine("Calendar Events Retrieved:");
+                foreach (var calendarEvent in events.Value) {
+                    if (calendarEvent == null) {
+                        Console.WriteLine("  Skipped a null event.");
+                        continue;
+                    }
+
+                    Console.WriteLine($"- {calendarEvent.Subject ?? "No Subject"} | " +
+                                      $"Start: {calendarEvent.Start?.DateTime ?? "Unknown"} | " +
+                                      $"End: {calendarEvent.End?.DateTime ?? "Unknown"}");
+                }
+            }
+            catch (Exception ex) {
+                Console.WriteLine($"Error retrieving calendar events: {ex.Message}");
+            }
+        }
+
+
     }
 }

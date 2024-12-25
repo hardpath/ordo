@@ -90,3 +90,4 @@ AI-powered assistant for seamlessly organising tasks and scheduling them into yo
 
 ## Documentation
 - [Requirements](docs/requirements.md): Detailed feature definitions and planning for Ordo.
+- [Authentication Method](docs/authentication.md): Details about the authentication method used and its rationale.

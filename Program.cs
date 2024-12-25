@@ -26,7 +26,11 @@ namespace Ordo
                 Console.WriteLine("Authenticated Graph Client Created!");
 
                 // Fetch tasks from Microsoft ToDo
-                await GraphClientHelper.FetchTasksAsync(graphClient, "eoliver@hardpath.co.uk"); // Replace with a valid user ID or email
+                //await GraphClientHelper.FetchTasksAsync(graphClient, "eoliver@hardpath.co.uk"); // Replace with a valid user ID or email
+
+                // Fetch calendar events
+                await GraphClientHelper.FetchCalendarEventsAsync(graphClient, "eoliver@hardpath.co.uk"); // Replace with a valid user email or ID
+
 
             }
             catch (Exception ex) {
