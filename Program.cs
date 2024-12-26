@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Graph;
 using Ordo.Api;
 using Ordo.Models;
 using Ordo.Core;
@@ -26,11 +25,8 @@ namespace Ordo
                 var openAiSettings = new OpenAiSettings();
                 configuration.GetSection("OpenAiSettings").Bind(openAiSettings);
 
-                // Get an authenticated Graph client
-                var graphClient = GraphClientHelper.GetAuthenticatedGraphClient(appSettings);
-
                 // Execute periodic tasks
-                // await RunTasks(graphClient, appSettings);
+                await RunTasks(appSettings);
 
                 // Test the OpenAI API
                 Console.WriteLine("Testing OpenAI integration...");
@@ -45,18 +41,18 @@ namespace Ordo
             }
         }
 
-        static async Task RunTasks(GraphServiceClient graphClient, AppSettings appSettings)
+        static async Task RunTasks(AppSettings appSettings)
         {
             Console.WriteLine("Starting periodic tasks...");
 
             // Synchronise tasks with Microsoft ToDo
-            await PeriodicTasks.SynchroniseTasksWithToDo(graphClient, appSettings);
+            await PeriodicTasks.SynchroniseTasksWithToDo(appSettings);
 
             // Validate task durations
-            await PeriodicTasks.ValidateTaskDurations(appSettings);
+            await PeriodicTasks.ValidateTaskDurations();
 
             // Sync with Microsoft 365 Calendar
-            await PeriodicTasks.CheckPastCalendarEvents(graphClient, appSettings);
+            await PeriodicTasks.CheckPastCalendarEvents(appSettings);
 
             Console.WriteLine("Periodic tasks completed successfully.");
         }

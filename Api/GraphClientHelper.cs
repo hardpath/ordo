@@ -5,34 +5,61 @@ using Ordo.Models;
 
 namespace Ordo.Api
 {
-    public static class GraphClientHelper
+    internal class GraphClientHelper
     {
-        internal static GraphServiceClient GetAuthenticatedGraphClient(AppSettings appSettings)
-        {
-            var clientSecretCredential = new ClientSecretCredential(
-                appSettings.TenantId,
-                appSettings.ClientId,
-                appSettings.ClientSecret
-            );
+        private static GraphClientHelper? _instance;
+        private static readonly object _lock = new object();
 
-            return new GraphServiceClient(clientSecretCredential);
+        private GraphServiceClient _graphClient;
+        private string? _userId;
+
+        private GraphClientHelper(AppSettings appSettings)
+        {
+            _graphClient = new GraphServiceClient(
+                new ClientSecretCredential(
+                    appSettings.TenantId,
+                    appSettings.ClientId,
+                    appSettings.ClientSecret
+                )
+            );
+            _userId = appSettings.UserId;
         }
 
-        public static async Task<List<TodoTaskList>> GetTaskListsAsync(GraphServiceClient graphClient, string userId)
+        internal static GraphClientHelper GetInstance(AppSettings appSettings)
         {
-            var taskLists = await graphClient.Users[userId].Todo.Lists.GetAsync();
+            if (_instance == null) {
+                lock (_lock) {
+                    if (_instance == null) {
+                        _instance = new GraphClientHelper(appSettings);
+                    }
+                }
+            }
+            return _instance;
+        }
+
+        internal static GraphClientHelper GetInstance()
+        {
+            if (_instance == null) {
+                throw new InvalidOperationException("GraphClientHelper is not initialized. Call GetInstance with AppSettings first.");
+            }
+            return _instance;
+        }
+
+        internal async Task<List<TodoTaskList>> GetTaskListsAsync()
+        {
+            var taskLists = await _graphClient.Users[_userId].Todo.Lists.GetAsync();
             return taskLists?.Value?.ToList() ?? new List<TodoTaskList>();
         }
 
-        public static async Task<List<TodoTask>> GetTasksAsync(GraphServiceClient graphClient, string userId, string listId)
+        internal async Task<List<TodoTask>> GetTasksAsync(string listId)
         {
-            var tasks = await graphClient.Users[userId].Todo.Lists[listId].Tasks.GetAsync();
+            var tasks = await _graphClient.Users[_userId].Todo.Lists[listId].Tasks.GetAsync();
             return tasks?.Value?.ToList() ?? new List<TodoTask>();
         }
 
-        public static async Task<List<Event>> GetCalendarEventsAsync(GraphServiceClient graphClient, string userId)
+        internal async Task<List<Event>> GetCalendarEventsAsync()
         {
-            var events = await graphClient.Users[userId].Calendar.Events.GetAsync();
+            var events = await _graphClient.Users[_userId].Calendar.Events.GetAsync();
             return events?.Value?.ToList() ?? new List<Event>();
         }
     }
