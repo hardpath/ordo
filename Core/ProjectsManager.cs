@@ -7,7 +7,7 @@ namespace Ordo.Core
     {
         private const string FilePath = "projects.json";
 
-        internal static ProjectsData LoadDurations()
+        internal static ProjectsData LoadData()
         {
             if (!File.Exists(FilePath)) {
                 return new ProjectsData();
@@ -19,19 +19,18 @@ namespace Ordo.Core
             return config;
         }
 
-        internal static void SaveDurations(ProjectsData config)
+        internal static void SaveData(ProjectsData config)
         {
-            string json = JsonSerializer.Serialize(
-                config,
-                new JsonSerializerOptions { WriteIndented = true }
-            );
+            var options = new JsonSerializerOptions { WriteIndented = true };
+
+            string json = JsonSerializer.Serialize(config, options);
             File.WriteAllText(FilePath, json);
         }
 
         internal static void UpdateTaskDuration(string projectId, string taskId, int duration)
         {
             // Load durations once
-            ProjectsData config = LoadDurations();
+            ProjectsData config = LoadData();
 
             // Find or create the project
             var project = config.Projects.FirstOrDefault(p => p.Id == projectId);
@@ -51,12 +50,12 @@ namespace Ordo.Core
             }
 
             // Save updated durations back to the file
-            SaveDurations(config);
+            SaveData(config);
         }
 
         internal static int? GetTaskDuration(string projectId, string taskId)
         {
-            ProjectsData config = LoadDurations();
+            ProjectsData config = LoadData();
 
             foreach (Project project in config.Projects) {
                 if (project.Id == projectId) {
