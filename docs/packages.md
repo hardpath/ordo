@@ -4,23 +4,23 @@ This file lists all the NuGet packages required for the Ordo project, along with
 
 ## Packages
 
-**Microsoft.Extensions.Configuration.Json**
-Provides support for loading configuration settings from `config.json`.
+- **Microsoft.Extensions.Configuration.Json**
+  Provides support for loading configuration settings from `config.json`.
 
-**Microsoft.Graph**
-Provides the SDK to interact with Microsoft Graph API.
+- **Microsoft.Graph**
+  Provides the SDK to interact with Microsoft Graph API.
 
-**Microsoft.Identity.Client**
- Handles authentication to Microsoft Graph using Azure Active Directory.
+- **Microsoft.Identity.Client**
+   Handles authentication to Microsoft Graph using Azure Active Directory.
 
-**Microsoft.Extensions.Configuration.Binder**
-Provides methods for binding configuration sections to strongly-typed objects.
+- **Microsoft.Extensions.Configuration.Binder**
+  Provides methods for binding configuration sections to strongly-typed objects.
 
-**Azure.Identity**
-Provides a modern and secure way to authenticate applications with Azure services.
+- **Azure.Identity**
+  Provides a modern and secure way to authenticate applications with Azure services.
 
-**OpenAI**
-Used for integrating ChatGPT functionality into the application.
+- **OpenAI**
+  Used for integrating ChatGPT functionality into the application.
 
 ## Notes
 - Use the NuGet Package Manager in Visual Studio to install these packages.

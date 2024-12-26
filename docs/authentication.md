@@ -1,4 +1,4 @@
-﻿# Authentication Method
+﻿# M365 Authentication Method
 
 ## Overview
 This application uses the **Application Permissions (Non-Interactive)** authentication model to access Microsoft 365 resources (Microsoft ToDo and Calendar).
