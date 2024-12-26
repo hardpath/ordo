@@ -30,9 +30,15 @@ namespace Ordo
                 var graphClient = GraphClientHelper.GetAuthenticatedGraphClient(appSettings);
 
                 // Execute periodic tasks
-                await RunTasks(graphClient, appSettings);
+                // await RunTasks(graphClient, appSettings);
 
-                Console.WriteLine($"OpenAI API Key: {openAiSettings.ApiKey}");
+                // Test the OpenAI API
+                Console.WriteLine("Testing OpenAI integration...");
+                if (string.IsNullOrEmpty(openAiSettings.ApiKey)) {
+                    Console.WriteLine("OpenAI API Key is missing. Please check your configuration.");
+                    return;
+                }
+                OpenAiHelper.TestOpenAiApi(openAiSettings.ApiKey);
             }
             catch (Exception ex) {
                 Console.WriteLine($"An error occurred: {ex.Message}");
