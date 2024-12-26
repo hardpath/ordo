@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
-using Ordo.Api;
-using Ordo.Models;
-using Ordo.Core;
+using ordo.Api;
+using ordo.Models;
+using ordo.Core;
 
 namespace Ordo
 {
@@ -19,6 +19,13 @@ namespace Ordo
                 // Bind the configuration to AppSettings
                 var appSettings = new AppSettings();
                 configuration.GetSection("AppSettings").Bind(appSettings);
+
+                // Validate configuration fields
+                if (!appSettings.Validate(out string errorMessage)) {
+                    Console.WriteLine($"[ERROR] {errorMessage}");
+                    Console.WriteLine("[ERROR] Application initialization failed due to invalid configuration. Exiting...");
+                    return; // Exit the application
+                }
 
                 // Bind the OpenAiSettings section
                 var openAiSettings = new OpenAiSettings();
@@ -45,13 +52,7 @@ namespace Ordo
             Console.WriteLine("Starting periodic tasks...");
 
             // Synchronise tasks with Microsoft ToDo
-            await PeriodicTasks.SynchroniseTasksWithToDo(appSettings);
-
-            // Validate task durations
-            await PeriodicTasks.ValidateTaskDurations();
-
-            // Sync with Microsoft 365 Calendar
-            await PeriodicTasks.CheckPastCalendarEvents(appSettings);
+            await PeriodicTasks.SynchroniseProjectsWithToDo(appSettings);
 
             Console.WriteLine("Periodic tasks completed successfully.");
         }

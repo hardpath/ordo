@@ -1,30 +1,45 @@
-﻿using ordo.Api;
+﻿using Microsoft.Graph.Models;
+using ordo.Api;
 using ordo.Models;
 
 namespace ordo.Core
 {
     internal static class PeriodicTasks
     {
-        public static async Task SynchroniseTasksWithToDo(AppSettings appSettings)
+        internal static async Task SynchroniseProjectsWithToDo(AppSettings appSettings)
         {
             var graphClientHelper = GraphClientHelper.GetInstance(appSettings);
 
             Console.WriteLine("[INFO] Starting task synchronisation with Microsoft ToDo...");
-            // TODO: Implement logic to fetch and synchronise tasks with ToDo
-        }
 
-        public static async Task ValidateTaskDurations()
-        {
-            Console.WriteLine("[INFO] Validating task durations...");
-            // TODO: Implement logic to validate and assign default durations
-        }
+            // Fetch task lists (projects)
+            List<TodoTaskList> todoTaskLists = await graphClientHelper.GetTaskListsAsync();
 
-        public static async Task CheckPastCalendarEvents(AppSettings appSettings)
-        {
-            var graphClientHelper = GraphClientHelper.GetInstance(appSettings);
+            foreach (TodoTaskList todoList in todoTaskLists) {
+                if (todoList.Id == null) {
+                    Console.WriteLine($"[WARNING] Task list {todoList.DisplayName} has a null ID and will be skipped.");
+                    continue;
+                }
 
-            Console.WriteLine("[INFO] Checking past calendar events...");
-            // TODO: Implement logic to identify past events and mark tasks for review
+                Console.WriteLine($"[INFO] Fetching tasks for project: {todoList.DisplayName}");
+
+                // Fetch tasks for each project
+                List<TodoTask> todoTasks = await graphClientHelper.GetTasksAsync(todoList.Id);
+
+                // Filter tasks without a due date
+                List<TodoTask> tasksWithDueDate = new List<TodoTask>();
+                foreach (var task in todoTasks) {
+                    if (task.DueDateTime != null) {
+                        tasksWithDueDate.Add(task);
+                    }
+                }
+
+                Console.WriteLine($"[INFO] Retrieved {tasksWithDueDate.Count} tasks with a due date for project: {todoList.DisplayName}");
+
+                // Next step: Compare filtered tasks with `durations.json`
+            }
+
+            Console.WriteLine("[INFO] Synchronization with Microsoft ToDo completed.");
         }
     }
 }
