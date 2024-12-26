@@ -8,9 +8,9 @@ This roadmap outlines the development milestones for Ordo based on the latest re
 - [x] Fetch tasks from Microsoft ToDo grouped by Lists (projects).
 - [x] Extract task details (Name, Due Date).
 - [ ] Manage task durations:
-  - [ ] Store estimated durations in a configuration file (e.g., `durations.json`).
+  - [ ] Store estimated durations in a configuration file `projects.json`.
   - [ ] Allow user-defined durations via ChatGPT.
-  - [ ] Use default durations for tasks when the user explicitly asks ChatGPT to apply the default.
+  - [ ] Durations will be managed dynamically and persisted in `projects.json`."
 
 ### 2. Calendar Integration
 - [x] Fetch existing events from Microsoft 365 Calendar:

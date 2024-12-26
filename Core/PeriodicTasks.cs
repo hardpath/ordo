@@ -10,7 +10,7 @@ namespace ordo.Core
         {
             var graphClientHelper = GraphClientHelper.GetInstance(appSettings);
 
-            Console.WriteLine("[INFO] Starting task synchronisation with Microsoft ToDo...");
+            Console.WriteLine("[INFO] Starting task synchronization with Microsoft ToDo...");
 
             // Fetch task lists (projects)
             List<TodoTaskList> todoTaskLists = await graphClientHelper.GetTaskListsAsync();
@@ -21,22 +21,28 @@ namespace ordo.Core
                     continue;
                 }
 
+                // Skip lists with [IGNORE] in their name
+                if (todoList.DisplayName != null && todoList.DisplayName.Contains("[IGNORE]", StringComparison.OrdinalIgnoreCase)) {
+                    Console.WriteLine($"[INFO] Skipping ignored task list: {todoList.DisplayName}");
+                    continue;
+                }
+
                 Console.WriteLine($"[INFO] Fetching tasks for project: {todoList.DisplayName}");
 
                 // Fetch tasks for each project
                 List<TodoTask> todoTasks = await graphClientHelper.GetTasksAsync(todoList.Id);
 
-                // Filter tasks without a due date
+                // Filter tasks without a due date using a traditional loop
                 List<TodoTask> tasksWithDueDate = new List<TodoTask>();
                 foreach (var task in todoTasks) {
-                    if (task.DueDateTime != null) {
+                    if (task.DueDateTime != null && task.Status != null && task.Status != Microsoft.Graph.Models.TaskStatus.Completed) {
                         tasksWithDueDate.Add(task);
                     }
                 }
 
                 Console.WriteLine($"[INFO] Retrieved {tasksWithDueDate.Count} tasks with a due date for project: {todoList.DisplayName}");
 
-                // Next step: Compare filtered tasks with `durations.json`
+                // Continue processing tasksWithDueDate
             }
 
             Console.WriteLine("[INFO] Synchronization with Microsoft ToDo completed.");

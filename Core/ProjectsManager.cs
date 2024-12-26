@@ -5,7 +5,7 @@ namespace Ordo.Core
 {
     internal static class ProjectsManager
     {
-        private const string FilePath = "durations.json";
+        private const string FilePath = "projects.json";
 
         internal static ProjectsData LoadDurations()
         {
