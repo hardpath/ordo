@@ -2,7 +2,6 @@
 using Ordo.Api;
 using Ordo.Models;
 using Ordo.Core;
-using ordo.Models;
 
 namespace Ordo
 {

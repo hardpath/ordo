@@ -1,8 +1,7 @@
-﻿using Microsoft.Graph;
-using Ordo.Api;
-using Ordo.Models;
+﻿using ordo.Api;
+using ordo.Models;
 
-namespace Ordo.Core
+namespace ordo.Core
 {
     internal static class PeriodicTasks
     {
