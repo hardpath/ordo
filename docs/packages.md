@@ -17,7 +17,10 @@ Provides the SDK to interact with Microsoft Graph API.
 Provides methods for binding configuration sections to strongly-typed objects.
 
 **Azure.Identity**
-provides a modern and secure way to authenticate applications with Azure services.
+Provides a modern and secure way to authenticate applications with Azure services.
+
+**OpenAI**
+Used for integrating ChatGPT functionality into the application.
 
 ## Notes
 - Use the NuGet Package Manager in Visual Studio to install these packages.

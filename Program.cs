@@ -3,6 +3,7 @@ using Microsoft.Graph;
 using Ordo.Api;
 using Ordo.Models;
 using Ordo.Core;
+using ordo.Models;
 
 namespace Ordo
 {
@@ -21,11 +22,17 @@ namespace Ordo
                 var appSettings = new AppSettings();
                 configuration.GetSection("AppSettings").Bind(appSettings);
 
+                // Bind the OpenAiSettings section
+                var openAiSettings = new OpenAiSettings();
+                configuration.GetSection("OpenAiSettings").Bind(openAiSettings);
+
                 // Get an authenticated Graph client
                 var graphClient = GraphClientHelper.GetAuthenticatedGraphClient(appSettings);
 
                 // Execute periodic tasks
                 await RunTasks(graphClient, appSettings);
+
+                Console.WriteLine($"OpenAI API Key: {openAiSettings.ApiKey}");
             }
             catch (Exception ex) {
                 Console.WriteLine($"An error occurred: {ex.Message}");
@@ -43,7 +50,7 @@ namespace Ordo
             await PeriodicTasks.ValidateTaskDurations(appSettings);
 
             // Sync with Microsoft 365 Calendar
-            await PeriodicTasks.SyncWithCalendar(graphClient, appSettings);
+            await PeriodicTasks.CheckPastCalendarEvents(graphClient, appSettings);
 
             Console.WriteLine("Periodic tasks completed successfully.");
         }

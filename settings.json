@@ -1,0 +1,4 @@
+﻿{
+    // Default task duration in minutes
+    "defaultTaskDurationMinutes": 30
+}

@@ -27,6 +27,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.0" />
     <PackageReference Include="Microsoft.Graph" Version="5.67.0" />
     <PackageReference Include="Microsoft.Identity.Client" Version="4.66.2" />
+    <PackageReference Include="OpenAI" Version="2.1.0" />
   </ItemGroup>
 
 </Project>
