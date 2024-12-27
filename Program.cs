@@ -4,7 +4,7 @@
     {
         static async Task Main(string[] args)
         {
-            Console.WriteLine("Welcome to Ordo - Task Scheduler!");
+            Console.WriteLine("Welcome to Ordo - AI Task Scheduler!");
             Console.WriteLine("Type 'help' to see the list of available commands.");
 
             while (true) {

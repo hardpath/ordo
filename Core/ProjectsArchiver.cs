@@ -10,6 +10,7 @@ namespace Ordo.Core
         internal static ProjectsData LoadData()
         {
             if (!File.Exists(FilePath)) {
+                Console.WriteLine("[WARNING] No projects found in projects.json. Returning an empty list.");
                 return new ProjectsData();
             }
 
@@ -27,7 +28,7 @@ namespace Ordo.Core
             File.WriteAllText(FilePath, json);
         }
 
-        internal static void UpdateTaskDuration(string projectId, string taskId, int duration)
+        internal static void SetTaskDuration(string projectId, string taskId, int duration)
         {
             // Load durations once
             ProjectsData config = LoadData();

@@ -10,9 +10,9 @@ Lay the foundation for user interaction with Ordo, enabling the user to issue co
   - [x] Display appropriate feedback for valid and invalid commands.
 - [x] Implement a "help" command to display available commands and their descriptions.
 - [x] Implement an "exit" command to quit the application with a goodbye message.
-- [ ] Provide stubs (placeholders) for key user commands:
+- [x] Provide stubs (placeholders) for key user commands:
   - [x] `get tasks`
-  - [ ] `get events`
+  - [x] `get events`
 - [x] Display meaningful feedback for unimplemented commands.
 
 ## Feature 2: Basic Task Management
@@ -20,21 +20,17 @@ Ordo can manage tasks, synchronize with ToDo, and maintain a local JSON file wit
 
 ### Tasks
 - [x] Fetch tasks from Microsoft ToDo grouped by Lists (projects).
-- [ ] Assign an alias to each task.
+- [x] Assign an alias to each task.
 - [x] Save tasks to `projects.json` for local storage and processing.
 - [x] Synchronize `projects.json` with Microsoft ToDo:
   - [x] Add new tasks from ToDo to `projects.json`.
   - [x] Update tasks in `projects.json` when changes occur in ToDo (e.g., due date or status changes).
   - [x] Remove tasks from `projects.json` if they are deleted or completed in ToDo.
-- [ ] Remove tasks with no due dates:
-  - [ ] Delete tasks without due dates from `projects.json`.
-- [ ] Implement functionality to set task durations via:
-  - [ ] User input in the command line.
-  - [ ] Updates through ChatGPT commands.
-- [x] Exclude tasks based on criteria:
-  - [x] `[IGNORE]` suffix in List names.
-  - [x] Tasks marked as completed.
-- [ ] Allow the user to manually trigger the retrieval of tasks from Microsoft ToDo.
+- [x] Remove tasks with no due dates from `projects.json`.
+- [x] Implement functionality to set task durations via User input in the command line.
+- [x] Exclude lists with `[IGNORE]` suffix in List names.
+- [x] Exclude tasks marked as completed.
+- [x] Allow the user to manually trigger the retrieval of tasks from Microsoft ToDo.
 
 ---
 

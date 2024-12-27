@@ -32,27 +32,18 @@ Ordo uses a command-line interface (CLI) to interact with the user. The applicat
 ### 3. User Commands
 The following commands are available:
 
-#### **fetch tasks**
-- **Description:** Fetch tasks from Microsoft ToDo and update `projects.json`.
+#### **get tasks**
+- **Description:** get tasks from Microsoft ToDo and update `projects.json`.
 - **Feedback Example:**
   ```
-  Tasks fetched successfully. Overdue tasks: [101] Task A, [102] Task B.
+  Tasks geted successfully. Overdue tasks: [101] Task A, [102] Task B.
   ```
 
-#### **fetch events**
-- **Description:** Fetch events from Microsoft 365 Calendar and update `events.json`.
+#### **get events**
+- **Description:** get events from Microsoft 365 Calendar and update `events.json`.
 - **Feedback Example:**
   ```
-  Calendar events fetched successfully and saved to 'events.json'.
-  ```
-
-#### **update durations**
-- **Description:** Set or update task durations interactively using aliases.
-- **Example Interaction:**
-  ```
-  Task Alias: 101
-  Enter new duration (minutes): 120
-  Duration updated successfully.
+  Calendar events geted successfully and saved to 'events.json'.
   ```
 
 #### **help**
@@ -60,10 +51,9 @@ The following commands are available:
 - **Output Example:**
   ```
   Available Commands:
-  - fetch tasks      Retrieve tasks from Microsoft ToDo.
-  - fetch events     Retrieve events from Microsoft 365 Calendar.
-  - update durations Update task durations.
-  - exit             Quit the application.
+  - get tasks      Retrieve tasks from Microsoft ToDo.
+  - get events     Retrieve events from Microsoft 365 Calendar.
+  - exit           Quit the application.
   ```
 
 #### **exit**
@@ -76,7 +66,7 @@ The following commands are available:
 ---
 
 ## Handling Overdue Tasks
-- After running the `fetch tasks` command:
+- After running the `get tasks` command:
   1. Scan for tasks in `projects.json` with due dates in the past.
   2. Highlight overdue tasks to the user with their aliases:
      ```
@@ -90,7 +80,7 @@ The following commands are available:
 ## Error Handling
 - If a command fails (e.g., due to an API error), provide clear feedback:
   ```
-  Error: Failed to fetch tasks from Microsoft ToDo. Check your configuration and try again.
+  Error: Failed to get tasks from Microsoft ToDo. Check your configuration and try again.
   ```
 - Allow the user to retry the operation without restarting the application.
 
@@ -99,26 +89,20 @@ The following commands are available:
 ## Example Interaction
 Here’s an example of a typical session with Ordo:
 ```
-Welcome to Ordo - Task Scheduler!
+Welcome to Ordo - AI Task Scheduler!
 Type 'help' to see the list of available commands.
 
 Ordo> help
 Available Commands:
-- fetch tasks      Retrieve tasks from Microsoft ToDo.
-- fetch events     Retrieve events from Microsoft 365 Calendar.
-- update durations Update task durations.
+- get tasks      Retrieve tasks from Microsoft ToDo.
+- get events     Retrieve events from Microsoft 365 Calendar.
 - exit             Quit the application.
 
-Ordo> fetch tasks
-Tasks fetched successfully. Overdue tasks: [101] Task A, [102] Task B.
+Ordo> get tasks
+Tasks geted successfully. Overdue tasks: [101] Task A, [102] Task B.
 
-Ordo> fetch events
-Calendar events fetched successfully and saved to 'events.json'.
-
-Ordo> update durations
-Task Alias: 101
-Enter new duration (minutes): 90
-Duration updated successfully.
+Ordo> get events
+Calendar events geted successfully and saved to 'events.json'.
 
 Ordo> exit
 Goodbye! Thank you for using Ordo.
