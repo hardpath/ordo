@@ -1,6 +1,6 @@
 ﻿using OpenAI.Chat;
 
-namespace ordo.Api
+namespace Ordo.Api
 {
     public static class OpenAiHelper
     {

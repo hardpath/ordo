@@ -1,9 +1,8 @@
 ﻿using Microsoft.Graph.Models;
-using ordo.Api;
-using ordo.Models;
-using Ordo.Core;
+using Ordo.Api;
+using Ordo.Models;
 
-namespace ordo.Core
+namespace Ordo.Core
 {
     internal static class SyncTasks
     {

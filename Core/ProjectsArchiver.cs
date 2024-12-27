@@ -1,5 +1,5 @@
 ﻿using System.Text.Json;
-using ordo.Models;
+using Ordo.Models;
 
 namespace Ordo.Core
 {

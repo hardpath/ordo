@@ -1,9 +1,9 @@
 ﻿using Azure.Identity;
 using Microsoft.Graph;
 using Microsoft.Graph.Models;
-using ordo.Models;
+using Ordo.Models;
 
-namespace ordo.Api
+namespace Ordo.Api
 {
     internal class GraphClientHelper
     {

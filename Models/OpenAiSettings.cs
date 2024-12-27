@@ -1,5 +1,5 @@
 ﻿
-namespace ordo.Models
+namespace Ordo.Models
 {
     internal class OpenAiSettings
     {
