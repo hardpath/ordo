@@ -1,34 +1,48 @@
 ﻿## 2. Calendar Integration
 
-- **Primary Source**: 
-  - Events are retrieved from Microsoft 365 Clendar, which serves as the central repository.
-  - Only the events within the time range defined between now and the 23:59 on the lastest due date of all tasks should be retrieved.
-  
-- **Event Attributes**:
-  - **Id**: The event unique identifier.
-  - **Title**: The subject of the event.
-  - **Start DateTime**: The event’s start time.
-  - **End DateTime**: The event’s end time.
+### 1. Event Retrieval
+- Fetches events from Microsoft 365 Calendar for a specified date range:
+  - From "now" to 23:59 on the latest due date of all tasks.
 
-- **Distinguish between**:
-  - **Ordo-Created Events**: Events with the suffix **"[ORDO]"** in their title, indicating they were added or managed by Ordo.
-  - **User-Created Events**: Events without the **"[ORDO]"** suffix, representing meetings or personal appointments created manually by the user.
+### 2. Event Attributes
+- **Id**: Unique identifier for the event.
+- **Title**: Event subject.
+- **Start DateTime**: Event start time.
+- **End DateTime**: Event end time.
+- **Task Link**: A reference to the associated task(s) by `Id`.
+  - For Ordo-created events: Links to the relevant task(s).
+  - For user-created events: The value is `null`.
 
-- **Adding New Events**:
-  - Enable Ordo to add new events to the calendar based on scheduled tasks.
-  - Each event will include:
-    - **Title**: Derived from the task name, with the suffix **"[ORDO]"**.
-    - **Start DateTime**: Based on the allocated time slot.
-    - **End DateTime**: Calculated using the task’s estimated duration and the scheduling.
-    - **Task Id**: From the task Id.
-  - Ordo-created events must avoid conflicts with user-created events.
+### 3. Event Distinction
+- **Ordo-Created Events**: Events with the `[ORDO]` suffix in their title.
+- **User-Created Events**: All other events, created manually by the user.
 
-- **Editing Existing Events**:
-  - Ordo can modify **only its own events** (those with the **"[ORDO]"** suffix).
-  - Changes may include:
-    - Adjusting the start or end time.
-    - Updating the title to reflect task changes.
-  - Ensure there are no scheduling conflicts when adding events.
-  - If a user creates an event that causes conflict, Ordo will reschedule its event automatically to avoid overlap.
-  - User-created events (without the **"[ORDO]"** suffix) remain untouched.
+### 4. Adding New Events
+- Ordo can add events to the calendar based on task schedules:
+  - **Title**: Derived from the task name with `[ORDO]` suffix.
+  - **Start/End DateTime**: Calculated based on task scheduling.
+  - **Task Id**: Associated task.
+
+### 5. Editing Events
+- Ordo modifies only its own events (those with `[ORDO]` suffix).
+- Updates include:
+  - Adjusting start or end times.
+  - Updating titles to reflect task changes.
+  - Delete events
+
+### 6. Conflict Management
+- Ordo avoids conflicts with user-created events.
+- If a user event causes a conflict, Ordo automatically reschedules its events.
+- **Note**: User-created events must remain unchanged.
+
+### 7. Visualization
+- Ordo does not provide visualization or listing of calendar events.
+- Users will rely on Microsoft Outlook to view calendar events.
+
+### 8. Local Storage for Events
+- All events (Ordo-created and user-created) will be saved in `events.json`.
+- The file is updated:
+  - When data is fetched from Microsoft ToDo or Calendar.
+  - After rescheduling and immediately before updating the Calendar.
+
 

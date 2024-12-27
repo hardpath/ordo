@@ -1,39 +1,37 @@
 ﻿## 1. ToDo Integration
 
-- **Primary Source**: 
-  - Tasks are retrieved from Microsoft ToDo, which serves as the central repository.
-  
-- **Project Organisation**:
-  - Tasks are grouped into **Lists** in ToDo, corresponding to **projects** in Ordo.
+### 1. Task Retrieval
+- Fetch tasks and their attributes from Microsoft ToDo, grouped by Lists (projects).
 
-- **Project Attributes**:
-  - **Id**: The project unique identifier.
-  - **Name**: The title of the project
+### 2. Attributes
+#### Projects
+- **Id**: Unique identifier for the project/list.
+- **Name**: Title of the project/list.
+- **IsMissing**: Indicates if the project was removed from Microsoft ToDo.
+- **Tasks**: List of tasks under the project.
 
-- - **Task Attributes**:
-  - **Id**: The task unique identifier.
-  - **Name**: The title of the task.
-  - **Due Date**: The deadline for completion.
+#### Tasks
+- **Id**: Unique identifier for the task.
+- **Name**: Title of the task.
+- **DueDate**: Deadline for task completion.
+- **Duration**: Estimated time to complete the task (in minutes, default: 0).
+- **IsMissing**: Indicates if the task was removed from Microsoft ToDo.
 
-- **Estimated Duration**:
-  - Ordo will manage **estimated task durations**, which are critical for scheduling.
-  - Duration values:
-    - Tasks without specified durations will default to zero; Ordo will not attempt any estimation.
-    - Can be customised via:
-      - A configuration file (e.g., `durations.json`).
-      - ChatGPT interaction (e.g., "Set task X to 2 hours").
+### 3. Estimated Duration
+- Default to `0` if not specified.
+- Customizable via:
+  - `projects.json` configuration file.
+  - ChatGPT instructions (e.g., "Set task X to 2 hours").
 
-- **Exclusion**:
-  - Tasks lists with [IGNORE] suffix in the name will be excluded from scheduling and further handling in Ordo.
-  - Tasks without a due date will be ignored by Ordo and excluded from scheduling and duration management.
-  - Completed tasks will be excluded from scheduling and further handling in Ordo.
+### 4. Exclusions
+- Lists/Projects with `[IGNORE]` in the name.
+- Tasks without due dates.
+- Completed tasks in ToDo.
 
-- **Cleanup**:
-  - Ordo will provide a **clean functionality** to:
-    - remove completed tasks from:
-      1. **Microsoft ToDo**.
-      2. The **JSON file** storing task durations.
-    - remove ignored projects from the **JSON file**.
-    - remove tasks without due date from the **JSON file**.
-  - **User-Triggered**: Cleanup will occur only when explicitly triggered by the user (e.g., via a ChatGPT command like "Clean completed tasks").
-  - **Confirmation**: Ordo will confirm before performing the cleanup to prevent accidental deletions.
+### 5. Cleanup Functionality
+- Removes completed tasks from Microsoft ToDo.
+- Updates `projects.json` by:
+  - Removing tasks that were completed in Microsoft ToDo.
+  - Removing tasks whose due dates were removed in Microsoft ToDo.
+  - Removing projects/lists marked as `[IGNORE]` in Microsoft ToDo.
+- **Confirmation Requirement**: The app will confirm with the user before performing each cleanup action.
