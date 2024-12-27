@@ -18,6 +18,7 @@ Ordo can manage tasks, synchronize with ToDo, and maintain a local JSON file wit
 - [x] Exclude tasks based on criteria:
   - [x] `[IGNORE]` suffix in List names.
   - [x] Tasks marked as completed.
+- [ ] Allow the user to manually trigger the retrieval of tasks from Microsoft ToDo.
 
 ---
 
@@ -45,6 +46,7 @@ Ordo integrates with the calendar, manages events, and ensures conflict-free sch
 - [ ] Ensure `events.json` is updated:
   - [ ] When data is fetched from the calendar.
   - [ ] After Ordo-created events are added, updated, or deleted.
+- [ ] Allow the user to manually trigger the retrieval of events from Microsoft 365 Calendar.
 
 ---
 
@@ -52,6 +54,7 @@ Ordo integrates with the calendar, manages events, and ensures conflict-free sch
 Ordo uses ChatGPT to generate schedules for tasks based on due dates, durations, and available calendar time. Ordo does not implement any scheduling logic.
 
 ### Tasks
+- [ ] Highlight tasks with overdue due dates in the ChatGPT response.
 - [ ] Prepare data for ChatGPT:
   - [ ] Include task details such as `Id`, `Name`, `DueDate`, and `Duration`.
   - [ ] Include calendar events with details like `Id`, `Title`, `Start DateTime`, `End DateTime`, and `Task Link`.

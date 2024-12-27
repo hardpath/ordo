@@ -35,3 +35,7 @@
   - Removing tasks whose due dates were removed in Microsoft ToDo.
   - Removing projects/lists marked as `[IGNORE]` in Microsoft ToDo.
 - **Confirmation Requirement**: The app will confirm with the user before performing each cleanup action.
+
+## 6. User Triggered Data Collection
+- Users must explicitly trigger the collection of tasks from Microsoft ToDo.
+- This action does not involve any interaction with ChatGPT.

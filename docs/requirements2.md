@@ -45,4 +45,6 @@
   - When data is fetched from Microsoft ToDo or Calendar.
   - After rescheduling and immediately before updating the Calendar.
 
-
+## 9. User Triggered Data Collection
+- Users must explicitly trigger the collection of events from the Microsoft 365 Calendar.
+- This action does not involve any interaction with ChatGPT.

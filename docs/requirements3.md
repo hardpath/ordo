@@ -22,6 +22,8 @@
 - Events must be rescheduled following the scheduling provided by ChatGPT.
 
 #### Suggestions for Conflicts
-- If ChatGPT cannot create a conflict-free schedule:
-  - ChatGPT will provide suggestions to the user for resolution.
-  - **Note**: Ordo is not expected to generate its own scheduling logic.
+- If ChatGPT cannot create a conflict-free schedule, ChatGPT will provide suggestions to the user for resolution.
+
+### Notes
+- Ordo is not expected to generate its own scheduling logic.
+- Tasks retrieved from Microsoft ToDo with a due date in the past must be highlighted by ChatGPT when asked to schedule.
