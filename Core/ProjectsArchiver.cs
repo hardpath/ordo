@@ -3,7 +3,7 @@ using ordo.Models;
 
 namespace Ordo.Core
 {
-    internal static class ProjectsManager
+    internal static class ProjectsArchiver
     {
         private const string FilePath = "projects.json";
 

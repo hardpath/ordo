@@ -31,7 +31,7 @@ namespace Ordo
                 var openAiSettings = new OpenAiSettings();
                 configuration.GetSection("OpenAiSettings").Bind(openAiSettings);
 
-                // Execute periodic tasks
+                // Execute tasks
                 await RunTasks(appSettings);
 
                 // Test the OpenAI API
@@ -52,7 +52,7 @@ namespace Ordo
             Console.WriteLine("Starting periodic tasks...");
 
             // Synchronise tasks with Microsoft ToDo
-            await PeriodicTasks.SynchroniseProjectsWithToDo(appSettings);
+            await SyncTasks.SynchroniseProjectsWithToDo(appSettings);
 
             Console.WriteLine("Periodic tasks completed successfully.");
         }

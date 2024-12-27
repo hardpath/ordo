@@ -5,7 +5,7 @@ using Ordo.Core;
 
 namespace ordo.Core
 {
-    internal static class PeriodicTasks
+    internal static class SyncTasks
     {
         internal static async Task SynchroniseProjectsWithToDo(AppSettings appSettings)
         {
@@ -79,7 +79,7 @@ namespace ordo.Core
             Console.WriteLine("[INFO] Loading projects from projects.json...");
 
             // Use the ProjectsManager to load the data
-            var projectsData = ProjectsManager.LoadData();
+            var projectsData = ProjectsArchiver.LoadData();
 
             if (projectsData == null || projectsData.Projects == null) {
                 Console.WriteLine("[WARNING] No projects found in projects.json. Returning an empty list.");
@@ -178,7 +178,7 @@ namespace ordo.Core
             };
 
             // Use ProjectsManager to save the data
-            ProjectsManager.SaveData(projectsData);
+            ProjectsArchiver.SaveData(projectsData);
 
             Console.WriteLine("[INFO] Updated projects successfully saved to projects.json.");
         }
