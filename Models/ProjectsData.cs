@@ -31,6 +31,23 @@ namespace Ordo.Models
             return count;
         }
 
+        public DateTime GetLatestDueDate()
+        {
+            DateTime latestDueDate = DateTime.MinValue;
+
+            foreach (var project in Projects) {
+                if (project.ToDelete)
+                    continue;
+                foreach (var task in project.Tasks) {
+                    if ( (task.DueDate > latestDueDate) && (!task.ToDelete) ) {
+                        latestDueDate = task.DueDate;
+                    }
+                }
+            }
+
+            return latestDueDate;
+        }
+
         private bool ProjectExists(string projectId)
         {
             foreach (var existingProject in Projects) {

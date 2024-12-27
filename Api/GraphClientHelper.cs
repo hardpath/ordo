@@ -45,6 +45,7 @@ namespace Ordo.Api
             return _instance;
         }
 
+        // ToDo
         internal async Task<List<TodoTaskList>> GetTaskListsAsync()
         {
             try {
@@ -77,19 +78,20 @@ namespace Ordo.Api
             }
         }
 
+        // Calendar
         internal async Task<List<Event>> GetCalendarEventsAsync()
         {
             try {
                 var events = await _graphClient.Users[_userId].Calendar.Events.GetAsync();
-                return events?.Value?.ToList() ?? new List<Event>();
+                return events?.Value?.ToList() ?? new List<Microsoft.Graph.Models.Event>();
             }
             catch (ServiceException ex) {
                 Console.WriteLine($"[ERROR] Graph API error while fetching calendar events: {ex.Message}");
-                return new List<Event>();
+                return new List<Microsoft.Graph.Models.Event>();
             }
             catch (Exception ex) {
                 Console.WriteLine($"[ERROR] Unexpected error while fetching calendar events: {ex.Message}");
-                return new List<Event>();
+                return new List<Microsoft.Graph.Models.Event>();
             }
         }
     }

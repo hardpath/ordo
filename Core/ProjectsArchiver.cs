@@ -9,15 +9,28 @@ namespace Ordo.Core
 
         internal static ProjectsData LoadData()
         {
-            if (!File.Exists(FilePath)) {
-                Console.WriteLine("[WARNING] No projects found in projects.json. Returning an empty list.");
-                return new ProjectsData();
+            ProjectsData? projectsData;
+
+            try {
+                if (!File.Exists(FilePath)) {
+                    Console.WriteLine($"[WARNING] File ${FilePath} not found; Returning an empty list.");
+                    return new ProjectsData();
+                }
+
+                string json = File.ReadAllText(FilePath);
+
+                projectsData = JsonSerializer.Deserialize<ProjectsData>(json);
+                if (projectsData == null) {
+                    Console.WriteLine("[WARNING] Deserialization returned null; creating a new empty ProjectsData object.");
+                    projectsData = new ProjectsData();
+                }
+            }
+            catch (JsonException ex) {
+                Console.WriteLine($"[ERROR] Failed to deserialize ${FilePath}: {ex.Message}");
+                projectsData = new ProjectsData();
             }
 
-            string json = File.ReadAllText(FilePath);
-            ProjectsData config = JsonSerializer.Deserialize<ProjectsData>(json) ?? new ProjectsData();
-
-            return config;
+            return projectsData;
         }
 
         internal static void SaveData(ProjectsData config)
