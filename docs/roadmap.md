@@ -1,10 +1,27 @@
 ﻿## Roadmap for Ordo
 
-## Feature 1: Basic Task Management
+## Feature 1: Basic User Interaction
+Lay the foundation for user interaction with Ordo, enabling the user to issue commands and receive feedback.
+
+### Tasks
+- [ ] Implement a command-line interface (CLI) for user interaction:
+  - [ ] Display a prompt (`Ordo>`) to accept user commands.
+  - [ ] Parse and validate user commands.
+  - [ ] Display appropriate feedback for valid and invalid commands.
+- [ ] Implement a "help" command to display available commands and their descriptions.
+- [ ] Implement an "exit" command to quit the application with a goodbye message.
+- [ ] Provide stubs (placeholders) for key user commands:
+  - [ ] `fetch tasks`
+  - [ ] `fetch events`
+  - [ ] `update durations`
+- [ ] Display meaningful feedback for unimplemented commands.
+
+## Feature 2: Basic Task Management
 Ordo can manage tasks, synchronize with ToDo, and maintain a local JSON file with additional task attributes.
 
 ### Tasks
 - [x] Fetch tasks from Microsoft ToDo grouped by Lists (projects).
+- [x] Assign an alias to each task.
 - [x] Save tasks to `projects.json` for local storage and processing.
 - [x] Synchronize `projects.json` with Microsoft ToDo:
   - [x] Add new tasks from ToDo to `projects.json`.
@@ -22,7 +39,7 @@ Ordo can manage tasks, synchronize with ToDo, and maintain a local JSON file wit
 
 ---
 
-## Feature 2: Calendar Integration
+## Feature 3: Calendar Integration
 Ordo integrates with the calendar, manages events, and ensures conflict-free scheduling.
 
 ### Tasks
@@ -50,7 +67,7 @@ Ordo integrates with the calendar, manages events, and ensures conflict-free sch
 
 ---
 
-## Feature 3: Task Scheduling with ChatGPT
+## Feature 4: Task Scheduling with ChatGPT
 Ordo uses ChatGPT to generate schedules for tasks based on due dates, durations, and available calendar time. Ordo does not implement any scheduling logic.
 
 ### Tasks

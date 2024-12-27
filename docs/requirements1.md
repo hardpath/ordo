@@ -13,6 +13,7 @@
 #### Tasks
 - **Id**: Unique identifier for the task.
 - **Name**: Title of the task.
+- **Alias**: Short alias (e.g., an incremental numeric ID) for user-friendly interaction.
 - **DueDate**: Deadline for task completion.
 - **Duration**: Estimated time to complete the task (in minutes, default: 0).
 - **IsMissing**: Indicates if the task was removed from Microsoft ToDo.
