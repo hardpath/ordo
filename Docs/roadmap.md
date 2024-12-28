@@ -38,8 +38,8 @@ Ordo can manage tasks, synchronize with ToDo, and maintain a local JSON file wit
 Ordo integrates with the calendar, manages events, and ensures conflict-free scheduling.
 
 ### Tasks
-- [ ] Fetch events from Microsoft 365 Calendar from now until the latest due date from the tasks.
-- [ ] Save all events (Ordo-created and user-created) to `events.json`.
+- [x] Fetch events from Microsoft 365 Calendar from now until the latest due date from the tasks.
+- [x] Save all events (Ordo-created and user-created) to `events.json`.
 - [ ] Distinguish between Ordo-created and user-created events:
   - [ ] Add `[ORDO]` suffix to the title of Ordo-created events.
   - [ ] Set the `Task Link` attribute in `events.json`:

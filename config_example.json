@@ -1,0 +1,11 @@
+﻿{
+  "AppSettings": {
+    "ClientId": "client-id",
+    "TenantId": "tenant-id",
+    "ClientSecret": "client-secret",
+    "UserId": "user@domain"
+  },
+  "OpenAiSettings": {
+    "ApiKey": "api-key"
+  }
+}

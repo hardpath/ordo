@@ -9,9 +9,13 @@
 
   <ItemGroup>
     <None Remove="config.json" />
+    <None Remove="config_example.json" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="config_example.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="config.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

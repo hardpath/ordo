@@ -11,6 +11,7 @@ namespace Ordo.Commands
         public static async Task Execute()
         {
             Console.WriteLine("[INFO] Fetching tasks from Microsoft ToDo...");
+
             try {
                 #region AppSettings
                 var configuration = new ConfigurationBuilder()
@@ -35,7 +36,7 @@ namespace Ordo.Commands
 
                 ProjectsArchiver.SaveData(finalData);
 
-                Console.WriteLine("[INFO] Tasks fetched and saved to projects.json successfully.");
+                Console.WriteLine("[INFO] Tasks fetched and saved to .json file successfully.");
 
                 int no_tasks_noduration = finalData.GetTasksWithoutDurationCount();
                 if (no_tasks_noduration > 0) {
@@ -54,10 +55,11 @@ namespace Ordo.Commands
 
             //Console.WriteLine("[INFO] Fetching data from Microsoft ToDo...");
 
-            // Fetch task lists (projects)
+            // Fetch task lists (projects) from ToDo
             List<TodoTaskList> todoTaskLists = await graphClientHelper.GetTaskListsAsync();
-            var projects = new ProjectsData();
 
+            // Map data to ProjectsData
+            var projects = new ProjectsData();
             foreach (TodoTaskList todoList in todoTaskLists) {
                 if (todoList.Id == null || todoList.DisplayName == null) {
                     //Console.WriteLine($"[WARNING] Skipping task list with null ID or DisplayName.");

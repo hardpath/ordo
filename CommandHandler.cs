@@ -11,11 +11,15 @@ namespace Ordo
             if (input.Equals("help", StringComparison.OrdinalIgnoreCase)) {
                 HelpCommand.Execute();
             }
+            else if (input.Equals("get data", StringComparison.OrdinalIgnoreCase)) {
+                await GetTasksCommand.Execute();
+                await GetEventsCommand.Execute();
+            }
             else if (input.Equals("get tasks", StringComparison.OrdinalIgnoreCase)) {
                 await GetTasksCommand.Execute();
             }
             else if (input.Equals("get events", StringComparison.OrdinalIgnoreCase)) {
-                GetEventsCommand.Execute();
+                await GetEventsCommand.Execute();
             }
             else if (input.Equals("set durations", StringComparison.OrdinalIgnoreCase)) {
                 SetDurationsCommand.Execute();
@@ -26,7 +30,7 @@ namespace Ordo
             else if (input.Equals("reset durations", StringComparison.OrdinalIgnoreCase)) {
                 ResetDurationsCommand.Execute();
             }
-            else if (input.Equals("exit", StringComparison.OrdinalIgnoreCase)) {
+            else if (input.Equals("exit", StringComparison.OrdinalIgnoreCase) || input.Equals("quit", StringComparison.OrdinalIgnoreCase)) {
                 Console.WriteLine("Goodbye! Thank you for using Ordo.");
                 Environment.Exit(0); // Exit the application
             }
