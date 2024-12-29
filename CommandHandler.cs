@@ -30,6 +30,12 @@ namespace Ordo
             else if (input.Equals("reset durations", StringComparison.OrdinalIgnoreCase)) {
                 ResetDurationsCommand.Execute();
             }
+            else if (input.Equals("plan", StringComparison.OrdinalIgnoreCase)) {
+                await PlanCommand.ExecuteAsync();
+            }
+            else if (input.Equals("delete", StringComparison.OrdinalIgnoreCase)) {
+                await PlanCommand.ExecuteAsync();
+            }
             else if (input.Equals("exit", StringComparison.OrdinalIgnoreCase) || input.Equals("quit", StringComparison.OrdinalIgnoreCase)) {
                 Console.WriteLine("Goodbye! Thank you for using Ordo.");
                 Environment.Exit(0); // Exit the application

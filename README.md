@@ -10,3 +10,7 @@ AI-powered assistant for seamlessly organising tasks and scheduling them into yo
 - [Windows Service Tasks](Docs/windows_service_tasks.md): Details the periodic tasks performed by Ordo's Windows Service.
 - [M365 Authentication Method](Docs/authentication.md): Details about the authentication method used and its rationale.
 - [Packages Used](Docs/packages.md): A list of NuGet packages used in this project and their purpose.
+
+## References
+- [Graph API](https://learn.microsoft.com/en-us/graph/api/overview?view=graph-rest-1.0)
+- 

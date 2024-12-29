@@ -1,6 +1,4 @@
-﻿using Microsoft.Graph.Models;
-using System;
-
+﻿
 namespace Ordo.Models
 {
     public class EventsData
@@ -31,6 +29,13 @@ namespace Ordo.Models
         public string type { get; set; } = string.Empty;
     }
 
+    public class NewEvent
+    {
+        public string subject { get; set; } = string.Empty;
+        public DateTimeZone? start { get; set; }
+        public DateTimeZone? end { get; set; }
+    }
+    
     public class DateTimeZone
     {
         public string dateTime { get; set; } = string.Empty;

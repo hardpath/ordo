@@ -38,9 +38,16 @@ namespace Ordo.Commands
 
                 Console.WriteLine("[INFO] Tasks fetched and saved to .json file successfully.");
 
-                int no_tasks_noduration = finalData.GetTasksWithoutDurationCount();
-                if (no_tasks_noduration > 0) {
-                    Console.WriteLine($"[WARNING] {no_tasks_noduration} tasks without duration.");
+                int tasks_count;
+
+                tasks_count = finalData.GetTasksWithoutDurationCount();
+                if (tasks_count > 0) {
+                    Console.WriteLine($"[WARNING] {tasks_count} tasks without duration.");
+                }
+
+                tasks_count = finalData.GetOverDueTasksCount();
+                if (tasks_count > 0) {
+                    Console.WriteLine($"[WARNING] {tasks_count} tasks are overdue.");
                 }
             }
             catch (Exception ex) {

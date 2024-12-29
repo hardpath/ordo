@@ -31,6 +31,25 @@ namespace Ordo.Models
             return count;
         }
 
+        public int GetOverDueTasksCount()
+        {
+            int count = 0;
+
+            foreach (var project in Projects) {
+                if (project.ToDelete) {
+                    continue;
+                }
+
+                foreach (var task in project.Tasks) {
+                    if ((task.DueDate < DateTime.UtcNow) && (!task.ToDelete)) {
+                        count++;
+                    }
+                }
+            }
+
+            return count;
+        }
+
         public DateTime GetLatestDueDate()
         {
             DateTime latestDueDate = DateTime.MinValue;

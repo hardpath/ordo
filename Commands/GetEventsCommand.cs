@@ -44,7 +44,7 @@ namespace Ordo.Commands
 
                 EventsArchiver.SaveData(calendarData);
 
-                Console.WriteLine("[INFO] Events successfully fetched and saved to .json file.");
+                Console.WriteLine("[INFO] Events fetched and saved to .json file.");
             }
             catch (Exception ex) {
                 Console.WriteLine($"[ERROR] An error occurred while fetching events: {ex.Message}");
