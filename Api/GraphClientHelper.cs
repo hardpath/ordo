@@ -253,6 +253,11 @@ namespace Ordo.Api
                 Console.WriteLine("[INFO] Adding events to the calendar...");
 
                 foreach (var eventData in scheduledEvents) {
+                    if (!eventData.Subject.Contains("[ORDO]")) {
+                        Console.WriteLine("[WARNING] Data from AI contain a non-ORDO event; event ignored");
+                        continue;
+                    }
+
                     // Prepare the request payload
                     var newEvent = new Event();
                     newEvent.Subject = eventData.Subject;

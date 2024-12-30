@@ -12,6 +12,8 @@ namespace Ordo.Commands
         public static async Task ExecuteAsync()
         {
             try {
+                Console.WriteLine("[INFO] Scheduling in progress...");
+
                 string json = Consolidate();
 
                 //File.WriteAllText("consolidated_data.json", json);
@@ -64,7 +66,7 @@ namespace Ordo.Commands
                         }
 
                         foreach (var problematicTask in problematicTasks) {
-                            Console.WriteLine($"{problematicTask.Project} - {problematicTask.Task}");
+                            Console.WriteLine($"{problematicTask.Project} - {problematicTask.Task} [{problematicTask.CompletionDate}]");
                         }
                     }
 
@@ -178,7 +180,7 @@ namespace Ordo.Commands
                 json = JsonSerializer.Serialize(scheduleRequest, options);
                 //File.WriteAllText(ScheduleFilePath, json);
 
-                Console.WriteLine($"[DEBUG] Schedule data consolidated.");
+                Console.WriteLine($"[DEBUG] Data consolidated.");
             }
             catch (Exception ex) {
                 Console.WriteLine($"[ERROR] An error occurred while consolidating schedule data: {ex.Message}");

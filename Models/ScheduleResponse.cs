@@ -14,6 +14,7 @@ namespace ordo.Models
     {
         public string Project { get; set; } = string.Empty;
         public string Task { get; set; } = string.Empty;
+        public string CompletionDate { get; set; } = string.Empty;
     }
 
 }

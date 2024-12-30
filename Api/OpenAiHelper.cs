@@ -1,12 +1,5 @@
-﻿using Azure;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Graph.Models;
-using Microsoft.Kiota.Abstractions;
+﻿using Microsoft.Extensions.Configuration;
 using OpenAI.Chat;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Ordo.Api
 {
@@ -15,6 +8,8 @@ namespace Ordo.Api
         public static async Task<string> GetScheduleAsync(string jsonData)
         {
             try {
+                Console.WriteLine($"[DEBUG] Prompting AI...");
+
                 // Load the prompt from the file
                 string promptFilePath = Path.Combine(AppContext.BaseDirectory, "Prompts\\scheduling.txt");
                 if (!File.Exists(promptFilePath)) {
@@ -32,12 +27,13 @@ namespace Ordo.Api
 
                 // Initialize the ChatClient with the API key and desired model
                 string apiKey = GetApiKey();
-                ChatClient client = new ChatClient(model: "gpt-4o", apiKey: apiKey);
-
-                Console.WriteLine("[INFO] Scheduling in progress...");
+                //ChatClient client = new ChatClient(model: "gpt-4o", apiKey: apiKey);
+                ChatClient client = new ChatClient(model: "o1-mini", apiKey: apiKey);
 
                 // Send the chat request
                 ChatCompletion completion = await client.CompleteChatAsync(prompt);
+
+                Console.WriteLine($"[DEBUG] AI response received.");
 
                 // Return the assistant's response
                 return completion.Content[0].Text;

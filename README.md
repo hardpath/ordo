@@ -12,4 +12,5 @@ AI-powered assistant for seamlessly organising tasks and scheduling them into yo
 - [Packages Used](Docs/packages.md): A list of NuGet packages used in this project and their purpose.
 
 ## References
-- [Graph API](https://learn.microsoft.com/en-us/graph/api/overview?view=graph-rest-1.0)
+- [Microsoft Graph API](https://learn.microsoft.com/en-us/graph/api/overview?view=graph-rest-1.0)
+- [Motion REST API](https://docs.usemotion.com/docs/motion-rest-api)
