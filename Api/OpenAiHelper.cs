@@ -24,7 +24,11 @@ namespace Ordo.Api
                 string prompt = File.ReadAllText(promptFilePath);
 
                 // Replace placeholder with actual JSON data
-                string fullPrompt = prompt.Replace("{{JSON_DATA}}", jsonData);
+                DateTime start = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour + 1, 0, 0);
+
+                prompt = prompt.Replace("{{START}}", start.ToString("dd/MM/yyyy HH:mm:ss"));
+                //Console.WriteLine(prompt); return null;
+                prompt = prompt.Replace("{{JSON_DATA}}", jsonData);
 
                 // Initialize the ChatClient with the API key and desired model
                 string apiKey = GetApiKey();
@@ -33,7 +37,7 @@ namespace Ordo.Api
                 Console.WriteLine("[INFO] Scheduling in progress...");
 
                 // Send the chat request
-                ChatCompletion completion = await client.CompleteChatAsync(fullPrompt);
+                ChatCompletion completion = await client.CompleteChatAsync(prompt);
 
                 // Return the assistant's response
                 return completion.Content[0].Text;

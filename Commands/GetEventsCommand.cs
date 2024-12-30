@@ -9,9 +9,9 @@ namespace Ordo.Commands
 {
     internal static class GetEventsCommand
     {
-        public static async Task Execute()
+        public static async Task ExecuteAsync()
         {
-            Console.Write("[INFO] Fetching events from Microsoft Calendar ");
+            Console.WriteLine("[INFO] Fetching events from Microsoft Calendar ");
 
             try {
                 #region AppSettings
@@ -29,18 +29,11 @@ namespace Ordo.Commands
                 }
                 #endregion
 
-                //Set start date
-                var startDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
+                //TODO: 2-Configurable start and end dates (for planning)
+                DateTime startDate = DateTime.Now.Date;
+                DateTime endDate = startDate.AddMonths(3);
 
-                //Set end date (from tasks in the json file)
-                var tasks = ProjectsArchiver.LoadData();
-                var endDate = tasks.GetLatestDueDate();
-
-                Console.WriteLine($"from {startDate.ToString("dd-MM-yyyy")} to {endDate.AddMonths(2).ToString("dd-MM-yyyy")}...");
-
-                var calendarData = await GetEventsFromCalendar(appSettings, startDate, endDate.AddMonths(2));
-
-                //var jsonData = EventsArchiver.LoadData();
+                var calendarData = await GetEventsFromCalendar(appSettings, startDate, endDate);
 
                 EventsArchiver.SaveData(calendarData);
 
@@ -51,7 +44,6 @@ namespace Ordo.Commands
             }
         }
 
-        #region Private Methods
         private static async Task<EventsData> GetEventsFromCalendar(AppSettings appSettings, DateTime startDate, DateTime endDate)
         {
             var graphClientHelper = GraphClientHelper.GetInstance(appSettings);
@@ -76,6 +68,12 @@ namespace Ordo.Commands
                     Console.WriteLine($"[WARNING] Event '{calendarEvent.subject}' with null end date; event ignored.");
                     continue;
                 }
+
+                if (calendarEvent.start.ToUTCDateTime() < startDate) { continue; }
+
+                if (calendarEvent.end.ToUTCDateTime() > endDate) { continue; }
+
+                // Map data
                 events.Add(new CalendarEvent {
                     Id = calendarEvent.id,
                     Subject = calendarEvent.subject ?? string.Empty,
@@ -87,6 +85,5 @@ namespace Ordo.Commands
 
             return events;
         }
-        #endregion
     }
 }

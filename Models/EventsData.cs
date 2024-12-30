@@ -27,19 +27,14 @@ namespace Ordo.Models
         public DateTimeZone? start { get; set; }
         public DateTimeZone? end { get; set; }
         public string type { get; set; } = string.Empty;
+        public bool isReminderOn { get; set; } = false;
+        public string showAs { get; set; } = string.Empty;
     }
 
-    public class NewEvent
-    {
-        public string subject { get; set; } = string.Empty;
-        public DateTimeZone? start { get; set; }
-        public DateTimeZone? end { get; set; }
-    }
-    
     public class DateTimeZone
     {
         public string dateTime { get; set; } = string.Empty;
-        public string timeZone { get; set; } = string.Empty;
+        public string timeZone { get; set; } = "UTC";
 
         public DateTime ToUTCDateTime()
         {

@@ -2,9 +2,11 @@
 using Azure.Identity;
 using Microsoft.Graph;
 using Microsoft.Graph.Models;
+using Ordo.Core;
 using Ordo.Models;
-using System.Text;
+using System;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Ordo.Api
 {
@@ -18,6 +20,7 @@ namespace Ordo.Api
 
         AppSettings _appSettings;
 
+        //TODO: 2-Call GraphClientHelper only once
         private GraphClientHelper(AppSettings appSettings)
         {
             _appSettings = appSettings;
@@ -52,7 +55,7 @@ namespace Ordo.Api
             return _instance;
         }
 
-        // ToDo
+        #region ToDo
         internal async Task<List<TodoTaskList>> GetTaskListsAsync()
         {
             try {
@@ -84,70 +87,153 @@ namespace Ordo.Api
                 return new List<TodoTask>();
             }
         }
+        #endregion
 
-        // Calendar
+        #region Calendar
         internal async Task<List<RawEvent>> GetCalendarEventsAsync(DateTime startDate, DateTime endDate)
         {
             var events = new List<RawEvent>();
             var recurringvents = new List<RawEvent>();
 
+            string requestEndpoint = $"https://graph.microsoft.com/v1.0/users/{_userId}/calendar/events";
+            string requestUrl;
+
+            var options = new JsonSerializerOptions {
+                PropertyNameCaseInsensitive = true, // Allow case-insensitive matching
+            };
+
+            string strStart, strEnd;
+
+            // Get all non-recurring events ('seriesMaster')
             try {
-                //string id = "AQMkADNmNWIyZmExLTNlYjEtNDhjNC1hMDM3LThhNTQ4MTNkM2E5ZABGAAADSxwVx38gmUyWpDMCW_EKigcAfL1FcVpKxUOnXVZw6bVamwAAAgENAAAAfL1FcVpKxUOnXVZw6bVamwAD0vXRGAAAAA==";
-                //string requestUrl = $"https://graph.microsoft.com/v1.0/users/{_userId}/calendar/events/{id}/instances?startDateTime=2024-01-01&endDateTime=2026-01-01";
-                
-                string requestUrl = $"https://graph.microsoft.com/v1.0/users/{_userId}/calendar/events/";
-                string jsonPayload = string.Empty;
+                strStart = startDate.ToString("yyyy-MM-dd");
+                strEnd = endDate.ToString("yyyy-MM-dd");
 
-                var jsonResponse = await HttpGetRequest(requestUrl, jsonPayload);
+                Console.WriteLine($"[DEBUG] Non-recurring from {strStart} to {strEnd}");
 
-                var options = new JsonSerializerOptions {
-                    PropertyNameCaseInsensitive = true, // Allow case-insensitive matching
-                };
+                requestUrl = requestEndpoint + $"?$filter=start/dateTime ge '{strStart}' and end/dateTime le '{strEnd}' and showAs eq 'busy' and type ne 'seriesMaster'";
+                do {
+                    var jsonResponse = await HttpGetRequest(requestUrl);
 
-                //Console.WriteLine($"... from {startDate.ToString()} to {endDate.ToString()}");
+                    var graphResponse = JsonSerializer.Deserialize<GraphResponse<RawEvent>>(jsonResponse, options);
 
-                var graphResponse = JsonSerializer.Deserialize<GraphResponse<RawEvent>>(jsonResponse, options);
-                if (graphResponse?.Value == null) {
-                    Console.WriteLine("[WARNING] Deserialisation returned null.");
-                }
-                else {
+                    if (graphResponse?.Value == null) {
+                        Console.WriteLine("[WARNING] Deserialisation returned null.");
+                        break;
+                    }
+
+                    // Filter data
                     foreach (var rawEvent in graphResponse.Value) {
                         if (rawEvent == null) continue;
-                        if (rawEvent.type == "seriesMaster")
-                            recurringvents.Add(rawEvent);
-                        else {
-                            if ( (rawEvent.start == null) || (rawEvent.end == null) ) { continue; }
-                            if (rawEvent.end.ToUTCDateTime()  < startDate) { continue; }
-                            if (rawEvent.start.ToUTCDateTime() > endDate) { continue; }
+
+                        if (rawEvent.type == "seriesMaster") {
+                            Console.WriteLine("[WARNING: Unexpected recurring event; event ignored.");
+                            continue;
+                        }
+
+                        if ((rawEvent.start == null) || (rawEvent.end == null)) { continue; }
+                        if (rawEvent.end.ToUTCDateTime() < startDate) { continue; }
+                        if (rawEvent.start.ToUTCDateTime() > endDate) { continue; }
+
+                        events.Add(rawEvent);
+                    }
+
+
+                    // Update the request URL with the next link
+                    requestUrl = graphResponse.NextLink ?? string.Empty;
+                } while (!string.IsNullOrEmpty(requestUrl));
+            }
+            catch (HttpRequestException ex) {
+                Console.WriteLine($"[ERROR] HTTP Request failed: {ex.Message}");
+            }
+            catch (Exception ex) {
+                Console.WriteLine($"[ERROR] An unexpected error occurred: {ex.Message}");
+            }
+
+            // Get all recurring events ('seriesMaster')
+            try {
+                strStart = startDate.AddYears(-2).ToString("yyyy-MM-dd");
+                strEnd = endDate.ToString("yyyy-MM-dd");
+
+                Console.WriteLine($"[DEBUG] Recurring from {strStart} to {strEnd}");
+
+                requestUrl = requestEndpoint + $"?$filter=start/dateTime ge '{strStart}' and end/dateTime le '{strEnd}' and showAs eq 'busy' and type eq 'seriesMaster'";
+                do {
+                    var jsonResponse = await HttpGetRequest(requestUrl);
+
+                    var graphResponse = JsonSerializer.Deserialize<GraphResponse<RawEvent>>(jsonResponse, options);
+
+                    if (graphResponse?.Value == null) {
+                        Console.WriteLine("[WARNING] Deserialisation returned null.");
+                        break;
+                    }
+
+                    // Filter data
+                    foreach (var rawEvent in graphResponse.Value) {
+                        if (rawEvent == null) continue;
+
+                        if (rawEvent.type != "seriesMaster") {
+                            Console.WriteLine("[WARNING: Unexpected recurring event; event ignored.");
+                            continue;
+                        }
+
+                        if ((rawEvent.start == null) || (rawEvent.end == null)) { continue; }
+
+                        recurringvents.Add(rawEvent);
+                    }
+
+
+                    // Update the request URL with the next link
+                    requestUrl = graphResponse.NextLink ?? string.Empty;
+                } while (!string.IsNullOrEmpty(requestUrl));
+            }
+            catch (HttpRequestException ex) {
+                Console.WriteLine($"[ERROR] HTTP Request failed: {ex.Message}");
+            }
+            catch (Exception ex) {
+                Console.WriteLine($"[ERROR] An unexpected error occurred: {ex.Message}");
+            }
+
+            // Get instances for recurring events
+            try {
+                strStart = startDate.ToString("yyyy-MM-dd");
+                strEnd = endDate.ToString("yyyy-MM-dd");
+
+                Console.WriteLine($"[DEBUG] Instances for recurring events");
+
+                foreach (var revent in recurringvents) {
+                    //requestUrl = requestEndpoint + $"?{revent.id}/instances?startDateTime={strStart}&endDateTime={strEnd}$filter=showAs eq 'busy'";
+                    requestUrl = requestEndpoint + $"/{revent.id}/instances?startDateTime={strStart}&endDateTime={strEnd}";
+                    do {
+                        var jsonResponse = await HttpGetRequest(requestUrl);
+
+                        var graphResponse = JsonSerializer.Deserialize<GraphResponse<RawEvent>>(jsonResponse, options);
+
+                        if (graphResponse?.Value == null) {
+                            Console.WriteLine("[WARNING] Deserialisation returned null.");
+                            break;
+                        }
+
+                        // Filter data
+                        foreach (var rawEvent in graphResponse.Value) {
+                            if (rawEvent == null) continue;
+
+                            if ((rawEvent.start == null) || (rawEvent.end == null)) { continue; }
 
                             events.Add(rawEvent);
                         }
-                    }
-                }
 
-                if (recurringvents.Count > 0) {
-                    foreach (var rawEvent in recurringvents) {
-                        //requestUrl = $"https://graph.microsoft.com/v1.0/users/{_userId}/calendar/events/{rawEvent.id}/instances?startDateTime={startDate.ToString("yyyy-MM-dd")}&endDateTime={endDate.ToString("yyyy-MM-dd")}";
-                        jsonPayload = $"{rawEvent.id}/instances?startDateTime={startDate.ToString("yyyy-MM-dd")}&endDateTime={endDate.ToString("yyyy-MM-dd")}";
 
-                        jsonResponse = await HttpGetRequest(requestUrl, jsonPayload);
-
-                        graphResponse = JsonSerializer.Deserialize<GraphResponse<RawEvent>>(jsonResponse, options);
-
-                        if (graphResponse?.Value == null) {
-                            Console.WriteLine("[WARNING] Deserialisation returned null for recurring events.");
-                        }
-                        else {
-                            foreach (var recEvent in graphResponse.Value) {
-                                events.Add(recEvent);
-                            }
-                        }
-
-                    }
+                        // Update the request URL with the next link
+                        requestUrl = graphResponse.NextLink ?? string.Empty;
+                    } while (!string.IsNullOrEmpty(requestUrl));
                 }
             }
+            catch (HttpRequestException ex) {
+                Console.WriteLine($"[ERROR] HTTP Request failed: {ex.Message}");
+            }
             catch (Exception ex) {
-                Console.WriteLine($"[ERROR] Error while fetching calendar events: {ex.Message}");
+                Console.WriteLine($"[ERROR] An unexpected error occurred: {ex.Message}");
             }
 
             return events;
@@ -179,6 +265,8 @@ namespace Ordo.Api
                     newEvent.End.DateTime = eventData.End.ToString("yyyy-MM-ddTHH:mm:ss");
                     newEvent.End.TimeZone = "UTC";
 
+                    newEvent.IsReminderOn = false;
+
                     await CreateCalendarEvent(newEvent);
                     createEvents++;
                 }
@@ -188,6 +276,34 @@ namespace Ordo.Api
             }
 
         }
+        
+        internal async Task<bool> DeleteEventsFromCalendarAsync()
+        {
+            //TODO: 2-Configurable start and end dates (for retrieval)
+            //TODO: 1-Remove retrieval of recurring events
+            List<RawEvent> events = await GetCalendarEventsAsync(DateTime.Now.AddMonths(-6), DateTime.Now.AddMonths(3));
+
+            bool eventsDeleted = false;
+            foreach (var rawEvent in events) {
+                if (!rawEvent.subject.Contains("[ORDO]")) { continue; }
+                
+                string id = rawEvent.id;
+                try {
+                    await _graphClient.Users[_userId].Events[id].DeleteAsync();
+                    eventsDeleted = true;
+                }
+                catch (ServiceException ex) {
+                    Console.WriteLine($"[ERROR] Graph API error while deleting event {rawEvent.subject}: {ex.Message}");
+                    return eventsDeleted;
+                }
+                catch (Exception ex) {
+                    Console.WriteLine($"[ERROR] Unexpected error while deleting event {rawEvent.subject}: {ex.Message}");
+                    return eventsDeleted;
+                }
+            }
+            return eventsDeleted;
+        }
+        #endregion
 
         #region Private
         // Helper method to retrieve the access token
@@ -204,7 +320,7 @@ namespace Ordo.Api
             return accessToken.Token;
         }
 
-        private async Task<string> HttpGetRequest(string url, string jsonPayload)
+        private async Task<string> HttpGetRequest(string url)
         {
             using var httpClient = new HttpClient();
 
@@ -212,8 +328,10 @@ namespace Ordo.Api
             string accessToken = await GetAccessTokenAsync();
             httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
 
+            //Console.WriteLine($"[DEBUG] {url}");
+
             // Send the GET request
-            var response = await httpClient.GetAsync(url + jsonPayload);
+            var response = await httpClient.GetAsync(url);
 
             // Ensure success status code
             response.EnsureSuccessStatusCode();
@@ -239,12 +357,35 @@ namespace Ordo.Api
                 throw;
             }
         }
-
-        // Helper class for deserialization
-        private class GraphResponse<T>
-        {
-            public List<T>? Value { get; set; }
-        }
         #endregion
+    }
+
+    // Helper class for deserialization
+    public class GraphResponse<T>
+    {
+        public List<T>? Value { get; set; } // Holds the current page of data
+        [JsonPropertyName("@odata.nextLink")]
+        public string? NextLink { get; set; } // URL to the next page of results
+    }
+
+    public class GraphErrorResponse
+    {
+        public GraphError? Error { get; set; }
+    }
+
+    public class GraphError
+    {
+        public string? Code { get; set; }
+        public string? Message { get; set; }
+        public InnerError? InnerError { get; set; }
+    }
+
+    public class InnerError
+    {
+        [JsonPropertyName("request-id")]
+        public string? RequestId { get; set; }
+
+        [JsonPropertyName("date")]
+        public string? Date { get; set; }
     }
 }

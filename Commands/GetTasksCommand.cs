@@ -8,7 +8,7 @@ namespace Ordo.Commands
 {
     internal static class GetTasksCommand
     {
-        public static async Task Execute()
+        public static async Task ExecuteAsync()
         {
             Console.WriteLine("[INFO] Fetching tasks from Microsoft ToDo...");
 
@@ -69,13 +69,13 @@ namespace Ordo.Commands
             var projects = new ProjectsData();
             foreach (TodoTaskList todoList in todoTaskLists) {
                 if (todoList.Id == null || todoList.DisplayName == null) {
-                    //Console.WriteLine($"[WARNING] Skipping task list with null ID or DisplayName.");
+                    Console.WriteLine($"[WARNING] Found task list with null ID or DisplayName; list ignored");
                     continue;
                 }
 
                 // Skip lists with [IGNORE] in their name
                 if (todoList.DisplayName.Contains("[IGNORE]", StringComparison.OrdinalIgnoreCase)) {
-                    //Console.WriteLine($"[INFO] Skipping ignored task list: {todoList.DisplayName}");
+                    Console.WriteLine($"[DEBUG] Skipping ignored task list: {todoList.DisplayName}");
                     continue;
                 }
 
@@ -156,7 +156,7 @@ namespace Ordo.Commands
                 }
             }
 
-            // TODO: Assign tasks aliases
+            // Assign tasks aliases
             AssignAliases(jsonData);
 
             return jsonData;

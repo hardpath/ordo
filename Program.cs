@@ -1,5 +1,8 @@
 ﻿namespace Ordo
 {
+    //TODO: 2-Console.WriteLine placement consistency
+    //TODO: 3-Message levels (ERROR/WARNING, INFO, DEBUG)
+
     class Program
     {
         static async Task Main(string[] args)

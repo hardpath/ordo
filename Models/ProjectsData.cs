@@ -41,13 +41,28 @@ namespace Ordo.Models
                 }
 
                 foreach (var task in project.Tasks) {
-                    if ((task.DueDate < DateTime.UtcNow) && (!task.ToDelete)) {
+                    if ((task.DueDate.Date < DateTime.UtcNow.Date) && (!task.ToDelete)) {
                         count++;
                     }
                 }
             }
 
             return count;
+        }
+
+        public void PrintOverDueTasks()
+        {
+            foreach (var project in Projects) {
+                if (project.ToDelete) {
+                    continue;
+                }
+
+                foreach (var task in project.Tasks) {
+                    if ((task.DueDate < DateTime.UtcNow) && (!task.ToDelete)) {
+                        Console.WriteLine($"{project.Name} - {task.Name}");
+                    }
+                }
+            }
         }
 
         public DateTime GetLatestDueDate()

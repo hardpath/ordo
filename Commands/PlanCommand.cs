@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Primitives;
 using ordo.Models;
 using Ordo.Api;
 using Ordo.Core;
@@ -48,12 +47,35 @@ namespace Ordo.Commands
                     return;
                 }
 
-                Console.WriteLine("\nDo you want to add events to the calendar? (yes/no):");
-                string? confirmation = Console.ReadLine();
+                while (true) {
+                    if (problematicTasks.Count > 0) {
+                        Console.WriteLine("\nADD events to the calendar, SEE problematic tasks or CANCEL?");
+                    }
+                    else {
+                        Console.WriteLine("\nADD events to the calendar or CANCEL?");
+                    }
 
-                if (!string.Equals(confirmation, "yes", StringComparison.OrdinalIgnoreCase)) {
-                    Console.WriteLine("[INFO] Scheduling operation canceled.");
-                    return; // Exit the command
+                    string? confirmation = Console.ReadLine();
+
+                    if (string.Equals(confirmation, "see", StringComparison.OrdinalIgnoreCase)) {
+                        if (problematicTasks.Count == 0) {
+                            Console.WriteLine("[INFO] There are no problematic tasks.");
+                            continue;
+                        }
+
+                        foreach (var problematicTask in problematicTasks) {
+                            Console.WriteLine($"{problematicTask.Project} - {problematicTask.Task}");
+                        }
+                    }
+
+                    if (string.Equals(confirmation, "cancel", StringComparison.OrdinalIgnoreCase)) {
+                        Console.WriteLine("[INFO] Scheduling operation canceled.");
+                        return;
+                    }
+
+                    if (string.Equals(confirmation, "add", StringComparison.OrdinalIgnoreCase)) {
+                        break;
+                    }
                 }
 
                 #region AppSettings
@@ -102,7 +124,7 @@ namespace Ordo.Commands
 
                 //string ScheduleFilePath = "schedule.json";
 
-                // Load projects from projects.json
+                #region Load projects from projects.json
                 var projectsData = ProjectsArchiver.LoadData();
                 var projects = new List<ProjectData>();
 
@@ -112,6 +134,7 @@ namespace Ordo.Commands
                     var projectTasks = new List<TaskData>();
                     foreach (var task in project.Tasks) {
                         if (task.ToDelete) continue;
+                        //TODO: 1-Ignore overdue tasks
 
                         projectTasks.Add(new TaskData {
                             Id = task.Id,
@@ -127,8 +150,9 @@ namespace Ordo.Commands
                         Tasks = projectTasks
                     });
                 }
+                #endregion
 
-                // Load events from events.json
+                #region Load events from events.json
                 var eventsData = EventsArchiver.LoadData();
                 var events = new List<EventData>();
 
@@ -141,6 +165,7 @@ namespace Ordo.Commands
                         IsOrdoCreated = calendarEvent.IsOrdoCreated
                     });
                 }
+                #endregion
 
                 // Combine into ScheduleRequest
                 var scheduleRequest = new ScheduleRequest {

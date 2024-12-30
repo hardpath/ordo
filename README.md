@@ -13,4 +13,3 @@ AI-powered assistant for seamlessly organising tasks and scheduling them into yo
 
 ## References
 - [Graph API](https://learn.microsoft.com/en-us/graph/api/overview?view=graph-rest-1.0)
-- 
