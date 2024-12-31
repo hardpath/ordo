@@ -1,7 +1,7 @@
 ﻿
 namespace Ordo.Models
 {
-    internal class AppSettings
+    internal class AppData
     {
         public string? ClientId { get; set; }
         public string? TenantId { get; set; }

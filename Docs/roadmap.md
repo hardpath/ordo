@@ -32,7 +32,17 @@ Ordo can manage tasks, synchronize with ToDo, and maintain a local JSON file wit
 - [x] Exclude tasks marked as completed.
 - [x] Allow the user to manually trigger the retrieval of tasks from Microsoft ToDo.
 
+## Motion Integration
+- [ ] List projects
+- [ ] Create projects
+- [ ] List tasks
+- [ ] Retrieve task
+- [ ] Create task
+- [ ] Delete task
+- [ ] Update task
+
 ---
+#  [DEPRECATED]
 
 ## Feature 3: Calendar Integration
 Ordo integrates with the calendar, manages events, and ensures conflict-free scheduling.
@@ -41,14 +51,14 @@ Ordo integrates with the calendar, manages events, and ensures conflict-free sch
 - [x] Fetch events from Microsoft 365 Calendar from now until the latest due date from the tasks.
 - [x] Save all events (Ordo-created and user-created) to `events.json`.
 - [ ] Distinguish between Ordo-created and user-created events:
-  - [ ] Add `[ORDO]` suffix to the title of Ordo-created events.
+  - [x] Add `[ORDO]` suffix to the title of Ordo-created events.
   - [ ] Set the `Task Link` attribute in `events.json`:
     - [ ] Ordo-created events link to the relevant task(s).
     - [ ] User-created events have a `null` value for the `Task Link`.
-- [ ] Add new Ordo-created events to the calendar:
-  - [ ] Create events based on tasks and their durations.
-  - [ ] Assign calculated start and end times.
-  - [ ] Ensure no conflicts with user-created events.
+- [x] Add new Ordo-created events to the calendar:
+  - [x] Create events based on tasks and their durations.
+  - [x] Assign calculated start and end times.
+  - [x] Ensure no conflicts with user-created events.
 - [ ] Update Ordo-created events in the calendar to reflect task changes:
   - [ ] Adjust event start or end times.
   - [ ] Update titles to reflect changes in associated tasks.

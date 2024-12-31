@@ -8,19 +8,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="config.json" />
-    <None Remove="config_example.json" />
-    <None Remove="Prompts\scheduling.txt" />
+    <Compile Remove="Prompts\**" />
+    <EmbeddedResource Remove="Prompts\**" />
+    <None Remove="Prompts\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="config_example.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <None Remove="config.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="config.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Prompts\scheduling.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
@@ -32,6 +30,12 @@
     <PackageReference Include="Microsoft.Graph" Version="5.67.0" />
     <PackageReference Include="Microsoft.Identity.Client" Version="4.66.2" />
     <PackageReference Include="OpenAI" Version="2.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="config_example.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

@@ -12,12 +12,9 @@ namespace Ordo
             if (input.Equals("help", StringComparison.OrdinalIgnoreCase)) {
                 HelpCommand.Execute();
             }
-            if (input.Equals("cleanup", StringComparison.OrdinalIgnoreCase)) {
-                CleanupCommand.Execute();
-            }
             else if (input.Equals("get data", StringComparison.OrdinalIgnoreCase)) {
-                await GetTasksCommand.ExecuteAsync();
-                await GetEventsCommand.ExecuteAsync();
+                await GetToDoDataCommand.ExecuteAsync();
+                await GetMotionDataCommand.ExecuteAsync();
             }
             else if (input.Equals("exit", StringComparison.OrdinalIgnoreCase) || input.Equals("quit", StringComparison.OrdinalIgnoreCase)) {
                 Console.WriteLine("Goodbye! Thank you for using Ordo.");
@@ -25,33 +22,15 @@ namespace Ordo
             }
             #endregion
 
-            #region Tasks
-            else if (input.Equals("get tasks", StringComparison.OrdinalIgnoreCase)) {
-                await GetTasksCommand.ExecuteAsync();
-            }
-            else if (input.Equals("set durations", StringComparison.OrdinalIgnoreCase)) {
-                SetDurationsCommand.Execute();
-            }
-            else if (input.Equals("set duration", StringComparison.OrdinalIgnoreCase)) {
-                SetDurationCommand.Execute();
-            }
-            else if (input.Equals("reset durations", StringComparison.OrdinalIgnoreCase)) {
-                ResetDurationsCommand.Execute();
+            #region ToDo
+            else if (input.Equals("get todo data", StringComparison.OrdinalIgnoreCase)) {
+                await GetToDoDataCommand.ExecuteAsync();
             }
             #endregion
 
-            #region Events
-            else if (input.Equals("get events", StringComparison.OrdinalIgnoreCase)) {
-                await GetEventsCommand.ExecuteAsync();
-            }
-            else if (input.Equals("delete events", StringComparison.OrdinalIgnoreCase)) {
-                await DeleteEventsCommand.ExecuteAsync();
-            }
-            #endregion
-
-            #region Scheduling
-            else if (input.Equals("plan", StringComparison.OrdinalIgnoreCase)) {
-                await PlanCommand.ExecuteAsync();
+            #region Motion
+            else if (input.Equals("get motion data", StringComparison.OrdinalIgnoreCase)) {
+                await GetMotionDataCommand.ExecuteAsync();
             }
             #endregion
 
