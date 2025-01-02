@@ -19,9 +19,6 @@ This file lists all the NuGet packages required for the Ordo project, along with
 - **Azure.Identity**
   - Provides a modern and secure way to authenticate applications with Azure services.
 
-- **OpenAI**
-  - Used for integrating ChatGPT functionality into the application.
-
 ## Notes
 - Use the NuGet Package Manager in Visual Studio to install these packages.
 - Ensure all required packages are installed before running the application.
