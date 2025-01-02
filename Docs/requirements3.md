@@ -1,29 +1,34 @@
-﻿## 3. Task Scheduling
+﻿## 3. Synchronisation
 
-### 1. Objective
-- Allocate tasks into calendar slots based on their due dates, durations, and available time.
+### Synchronisation Method
+- Update Motion Tasks as follows:
+| ToDo  | Motion | Action                                                   |
+|-------|--------|----------------------------------------------------------|
+|  YES  |   NO   | If task was in Motion before, mark as Completed in Todo  |
+|       |        | If task was not in Motion before, create in Motion       |
+|  NO   |   YES  | Warn user                                                |
+|  YES  |   YES  | Keep the Name and Due Date updated in Motion             |
+|  NO   |   NO   | (none)                                                   |
 
-### 2. Key Features
-#### Inputs for Scheduling
-- The following data is provided to ChatGPT for scheduling:
-  - **Tasks List**: Tasks retrieved from Microsoft ToDo, including:
-    - Task `Id`, `Name`, `DueDate`, and `Duration`.
-  - **Existing Events**: Events fetched from the Calendar, including:
-    - Event `Id`, `Title`, `Start DateTime`, `End DateTime`, and `Task Link` (if applicable).
+### Sequence
+1. Fetch data from ToDo and save in `todo.json`.
+2. Fetch data from Motion and save in `motion.json`.
+3. For each task from `todo.json`,
+   a. If in `ids.json`, update **Name** and **Due Date** in Motion
+   b. If not in `ids.json`, create in Motion and add to `ids.json`.
+4. For each task in `motion.json`, if not in `ids.json`, warn the user
+5. For each entry in `ids.json`,
+   a. If not in `motion.json`, mark as **Completed** in ToDo.
+   b. If not in `motion.json` and not in `todo.json`, delete from `ids.json`.
 
-#### Deadline-Oriented Scheduling
-- Tasks will be scheduled to be completed by their **due date**.
-- Parameters passed to ChatGPT for scheduling include:
-  - **Maximum work time**: Duration without any breaks.
-  - **Minimum event duration**: Smallest allowable block size.
-  - **Break time**: Break duration (in multiples of 5 minutes).
-
-#### Rescheduling
-- Events must be rescheduled following the scheduling provided by ChatGPT.
-
-#### Suggestions for Conflicts
-- If ChatGPT cannot create a conflict-free schedule, ChatGPT will provide suggestions to the user for resolution.
+### Generic functionalities
+- Associate ToDo Lists names' prefixes to Motion Workspaces:
+  - Define a json format to hold this association.
+  - Use regular expression on tasks names' prefix to distiguish between different workspaces.
+  - Ensure that associations defined in json are unique.
+- Associate ToDo Lists to Motion Projects:
+  - Define a json format to hold this association.
+  - Ensure that assoications define in json are unique.
+- Associate ToDO Tasks to Motion Tasks.
 
 ### Notes
-- Ordo is not expected to generate its own scheduling logic.
-- Tasks retrieved from Microsoft ToDo with a due date in the past must be highlighted by ChatGPT when asked to schedule.
