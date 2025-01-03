@@ -1,24 +1,25 @@
 ﻿## 1. ToDo Integration
 
 ### Task Retrieval
-- Fetch tasks and their attributes from Microsoft ToDo, grouped by Lists (projects).
-- Ignore ToDo List with [IGNORE] in the name.
-- Ignore ToDo Tasks with no due date.
-- Ignore completed ToDo Tasks.
+- [x] Fetch tasks and their attributes from Microsoft ToDo, grouped by Lists (projects).
+
+### Exclusions
+- [x] Ignore ToDo List with [IGNORE] in the name.
+- [x] Ignore ToDo Tasks with no due date.
+- [x] Ignore completed ToDo Tasks.
 
 ### Attributes
+
 #### Lists
-- **Id**: Unique identifier for the project/list.
-- **Name**: Title of the project/list.
+- **id** (*string*): A unique identifier for the list.
+- **displayName** (*string*): The name of the task list.
 
 #### Tasks
-- **Id**: Unique identifier for the task.
-- **Title**: Title of the task.
-- **DueDate**: Deadline for task completion.
-- **Status**: Status of the tasks (completed or not).
+- **id** (*string*): A unique identifier for the task.
+- **title** (*string*): The title or description of the task.
+- **status** (*string*): The current status of the task (e.g., "notStarted").
+- **dueDateTime** (object):
+  - **dateTime** (*string*): The due date and time in ISO 8601 format.
+  - **timeZone** (*string*): The time zone for the due date and time.
+- **ListId** (*string*): A reference to the id of the list that the task belongs to.
 
-### 4. Exclusions
-- Lists with `[IGNORE]` in the name.
-- Tasks:
-  - Without due dates.
-  - Completed.

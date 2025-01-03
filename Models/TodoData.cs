@@ -55,5 +55,25 @@ namespace Ordo.Models
 
         [JsonPropertyName("timeZone")]
         public string TimeZone { get; set; } = string.Empty;
+
+        public DateTime GetUtcTime()
+        {
+            try {
+                if (!System.DateTime.TryParse(DateTime, out var localDateTime)) {
+                    throw new FormatException("Invalid DateTime format.");
+                }
+
+                // Get the TimeZoneInfo object
+                var timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(TimeZone);
+
+                // Convert the local time to UTC
+                var utcTime = TimeZoneInfo.ConvertTimeToUtc(localDateTime, timeZoneInfo);
+
+                return utcTime;
+            }
+            catch (Exception ex) {
+                throw new InvalidOperationException($"Failed to calculate UTC time: {ex.Message}");
+            }
+        }
     }
 }

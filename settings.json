@@ -1,4 +1,7 @@
 ﻿{
-    // Default task duration in minutes
-    "defaultTaskDurationMinutes": 30
+  "AbortTodoOverdue": true,
+  "AbortMotionZombie": true,
+  "Debug": false,
+  "Refresh": 15,
+  "Log": ""
 }

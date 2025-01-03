@@ -1,6 +1,7 @@
 ﻿using Azure.Core;
 using Azure.Identity;
 using Microsoft.Extensions.Configuration;
+using Ordo.Log;
 using Ordo.Models;
 
 namespace Ordo.Api
@@ -9,19 +10,21 @@ namespace Ordo.Api
     {
         private static GraphClientHelper? _instance;
         private static readonly object _lock = new object();
-        private readonly AppData _appSettings;
+        private readonly GraphConfig _appConfig;
         private const string _baseUrl = "https://graph.microsoft.com/v1.0/users/";
 
-        public static GraphClientHelper GetInstance()
+        public static GraphClientHelper Instance
         {
-            if (_instance == null) {
-                lock (_lock) {
-                    if (_instance == null) {
-                        _instance = new GraphClientHelper();
+            get {
+                if (_instance == null) {
+                    lock (_lock) {
+                        if (_instance == null) {
+                            _instance = new GraphClientHelper();
+                        }
                     }
                 }
+                return _instance;
             }
-            return _instance;
         }
 
         public async Task<List<TodoList>> GetListsAsync()
@@ -30,7 +33,7 @@ namespace Ordo.Api
                 var allLists = new List<TodoList>();
 
                 // Construct the endpoint URL using the UserId from AppSettings
-                var url = $"{_baseUrl}{_appSettings.UserId}/todo/lists";
+                var url = $"{_baseUrl}{_appConfig.UserId}/todo/lists";
 
                 // Use the HttpGetRequestAsync method to make the GET request
                 var jsonResponse = await HttpGetRequestAsync(url);
@@ -62,11 +65,11 @@ namespace Ordo.Api
                 return allLists;
             }
             catch (System.Text.Json.JsonException ex) {
-                Console.WriteLine($"JSON parsing error: {ex.Message}");
+                Logger.Instance.Log(LogLevel.ERROR, $"JSON parsing error: {ex.Message}");
                 throw;
             }
             catch (Exception ex) {
-                Console.WriteLine($"Error retrieving To-Do lists: {ex.Message}");
+                Logger.Instance.Log(LogLevel.ERROR, $"Error retrieving To-Do lists: {ex.Message}");
                 throw;
             }
         }
@@ -77,7 +80,7 @@ namespace Ordo.Api
                 var allTasks = new List<TodoTask>();
 
                 // Construct the endpoint URL using the UserId and TodoListId from AppSettings
-                var url = $"{_baseUrl}{_appSettings.UserId}/todo/lists/{todoListId}/tasks";
+                var url = $"{_baseUrl}{_appConfig.UserId}/todo/lists/{todoListId}/tasks";
 
                 // Use the HttpGetRequestAsync method to make the GET request
                 var jsonResponse = await HttpGetRequestAsync(url);
@@ -125,11 +128,11 @@ namespace Ordo.Api
                 return allTasks;
             }
             catch (System.Text.Json.JsonException ex) {
-                Console.WriteLine($"JSON parsing error: {ex.Message}");
+                Logger.Instance.Log(LogLevel.ERROR, $"JSON parsing error: {ex.Message}");
                 throw;
             }
             catch (Exception ex) {
-                Console.WriteLine($"Error retrieving To-Do tasks: {ex.Message}");
+                Logger.Instance.Log(LogLevel.ERROR, $"Error retrieving To-Do tasks: {ex.Message}");
                 throw;
             }
         }
@@ -143,10 +146,10 @@ namespace Ordo.Api
                 .AddJsonFile("config.json", optional: false, reloadOnChange: true)
                 .Build();
 
-            _appSettings = new AppData();
-            configuration.GetSection("AppSettings").Bind(_appSettings);
+            _appConfig = new GraphConfig();
+            configuration.GetSection("GraphConfig").Bind(_appConfig);
 
-            if (!_appSettings.Validate(out string errorMessage)) {
+            if (!_appConfig.Validate(out string errorMessage)) {
                 throw new Exception($"Configuration validation failed: {errorMessage}");
             }
         }
@@ -154,9 +157,9 @@ namespace Ordo.Api
         private async Task<string> GetAccessTokenAsync()
         {
             var clientCredential = new ClientSecretCredential(
-                _appSettings.TenantId,
-                _appSettings.ClientId,
-                _appSettings.ClientSecret
+                _appConfig.TenantId,
+                _appConfig.ClientId,
+                _appConfig.ClientSecret
             );
 
             var tokenRequestContext = new TokenRequestContext(new[] { "https://graph.microsoft.com/.default" });

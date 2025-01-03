@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Ordo.Log;
 using Ordo.Models;
 using System.Text;
 
@@ -11,16 +12,18 @@ namespace Ordo.Api
         private readonly string _apiKey;
         private const string BaseUrl = "https://api.usemotion.com/v1";
 
-        public static MotionHelper GetInstance()
+        public static MotionHelper Instance
         {
-            if (_instance == null) {
-                lock (_lock) {
-                    if (_instance == null) {
-                        _instance = new MotionHelper();
+            get {
+                if (_instance == null) {
+                    lock (_lock) {
+                        if (_instance == null) {
+                            _instance = new MotionHelper();
+                        }
                     }
                 }
+                return _instance;
             }
-            return _instance;
         }
 
         public async Task<List<MotionWorkspace>> GetWorkspacesAsync()
@@ -113,7 +116,7 @@ namespace Ordo.Api
                     .Build();
 
                 // Retrieve the API key from the OpenAiSettings section
-                var apiKey = configuration["MotionSettings:ApiKey"];
+                var apiKey = configuration["MotionConfig:ApiKey"];
 
                 if (string.IsNullOrEmpty(apiKey)) {
                     throw new Exception("API key is missing or empty in config.json.");
@@ -289,11 +292,11 @@ namespace Ordo.Api
                 return (response.IsSuccessStatusCode, content);
             }
             catch (HttpRequestException ex) {
-                Console.WriteLine($"[ERROR] HTTP Request failed: {ex.Message}");
+                Logger.Instance.Log(LogLevel.ERROR, $"[ERROR] HTTP Request failed: {ex.Message}");
                 throw;
             }
             catch (Exception ex) {
-                Console.WriteLine($"[ERROR] An unexpected error occurred: {ex.Message}");
+                Logger.Instance.Log(LogLevel.ERROR, $"[ERROR] An unexpected error occurred: {ex.Message}");
                 throw;
             }
         }
