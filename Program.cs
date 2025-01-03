@@ -32,6 +32,8 @@ namespace Ordo
 
             if (await SynchroniseMotionData()) return;
 
+            if (CheckMotionZombies()) return;
+
             Logger.Instance.Log(LogLevel.INFO, "Synchronisation completed.");
         }
 
@@ -122,5 +124,36 @@ namespace Ordo
             }
         }
 
+        private static bool CheckMotionZombies()
+        {
+            List<string> missingTasks = new List<string>();
+
+            foreach (var task in _motionData.Tasks) {
+                bool found = false;
+                foreach (var id in _idsData.Ids) {
+                    if (task.Id == id.MotionId) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    missingTasks.Add(task.Name);
+                }
+            }
+
+            // Display results
+            if (missingTasks.Count > 0) {
+                string message = $"Zombie motion tasks: {string.Join(", ", missingTasks)}";
+
+                if (_appSettings.AbortMotionZombie ?? true) {
+                    Logger.Instance.Log(LogLevel.ERROR, message);
+                    return true;
+                }
+
+                Logger.Instance.Log(LogLevel.WARNING, message);
+            }
+
+            return false;
+        }
     }
 }

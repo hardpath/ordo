@@ -3,7 +3,7 @@
 ### Sequence
 - [x] Fetch data from ToDo and save in `todo.json`.
 - [x] Fetch data from Motion and save in `motion.json`.
-- [ ] For each task in `motion.json`, if not in `ids.json`, warn the user
+- [x] For each task in `motion.json`, if not in `ids.json`, warn the user
 - [ ] For each task from `todo.json`,
       - [ ] If in `ids.json`, update **Name** and **Due Date** in Motion
       - [ ] If not in `ids.json`, create in Motion and add to `ids.json`.
