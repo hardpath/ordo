@@ -8,6 +8,15 @@ namespace Ordo.Models
     {
         public List<TodoList> Lists { get; set; } = new();
         public List<TodoTask> Tasks { get; set; } = new();
+    
+        public string GetListName(string listId)
+        {
+            foreach (var list in Lists) {
+                if (list.Id == listId) return list.DisplayName;
+            }
+
+            return string.Empty;
+        }
     }
 
     public class TodoListsResponse

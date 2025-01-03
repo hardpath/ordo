@@ -2,6 +2,7 @@
 using Ordo.Log;
 using Ordo.Models;
 using System.Text;
+using System.Text.Json;
 
 namespace Ordo.Api
 {
@@ -11,6 +12,7 @@ namespace Ordo.Api
         private static readonly object _lock = new object();
         private readonly string _apiKey;
         private const string BaseUrl = "https://api.usemotion.com/v1";
+        private static int _requestCounter = 0; // Static to track across method calls
 
         public static MotionHelper Instance
         {
@@ -100,6 +102,226 @@ namespace Ordo.Api
             }
         }
 
+        public async Task<string> AddProjectAsync(string projectName, string workspaceId)
+        {
+            var payload = new Dictionary<string, object>();
+            payload["name"] = projectName;
+            payload["workspaceId"] = workspaceId;
+            payload["priority"] = "MEDIUM";
+
+            try {
+                var (isSuccess, responseContent) = await MakeRequestAsync("projects", HttpMethod.Post, null, payload);
+
+                if (!isSuccess) {
+                    HandleErrorResponse(responseContent);
+                }
+
+                // Parse respinseContent
+                var createdProject = JsonSerializer.Deserialize<MotionProject>(responseContent);
+
+                if (createdProject == null) {
+                    throw new Exception($"Response JSON does not match the expected format [{responseContent}]");
+                }
+
+                if (string.IsNullOrEmpty(createdProject.Id)) {
+                    throw new Exception("Project ID from Motion came null or empty.");
+                }
+
+                return createdProject.Id;
+            }
+            catch (JsonException ex) {
+                throw new Exception($"Failed to parse response JSON: {ex.Message}", ex);
+            }
+            catch (Exception ex) {
+                throw new Exception($"POST failed to create project: {ex.Message}", ex);
+            }
+        }
+
+        public async Task<string> AddTaskAsync(string taskName, string workspaceId, string projectId, string dueDate)
+        {
+            var payload = new Dictionary<string, object>();
+            payload["name"] = taskName;
+            payload["workspaceId"] = workspaceId;
+            payload["projectId"] = projectId;
+            payload["dueDate"] = dueDate;
+
+            try {
+                var (isSuccess, responseContent) = await MakeRequestAsync("tasks", HttpMethod.Post, null, payload);
+
+                if (!isSuccess) {
+                    HandleErrorResponse(responseContent);
+                }
+
+                // Parse respinseContent
+                var createdTask = JsonSerializer.Deserialize<MotionTask>(responseContent);
+
+                if (createdTask == null) {
+                    throw new Exception($"Response JSON does not match the expected format [{responseContent}]");
+                }
+
+                if (string.IsNullOrEmpty(createdTask.Id)) {
+                    throw new Exception("Project ID from Motion came null or empty.");
+                }
+
+                return createdTask.Id;
+            }
+            catch (JsonException ex) {
+                throw new Exception($"Failed to parse response JSON: {ex.Message}", ex);
+            }
+            catch (Exception ex) {
+                throw new Exception($"POST failed to create task: {ex.Message}", ex);
+            }
+        }
+
+        public async Task EditTaskAsync(string taskId, string taskName, string dueDate)
+        {
+            string endpoint = $"tasks/{taskId}";
+
+            var payload = new Dictionary<string, object>();
+            payload["name"] = taskName;
+            payload["dueDate"] = dueDate;
+
+            try {
+                var (isSuccess, responseContent) = await MakeRequestAsync(endpoint, HttpMethod.Patch, null, payload);
+
+                if (!isSuccess) {
+                    HandleErrorResponse(responseContent);
+                }
+
+                // Parse respinseContent
+                var editedTasks = JsonSerializer.Deserialize<MotionTask>(responseContent);
+
+                if (editedTasks == null) {
+                    throw new Exception($"Response JSON does not match the expected format [{responseContent}]");
+                }
+
+                if (string.IsNullOrEmpty(editedTasks.Id)) {
+                    throw new Exception("Edited task ID from Motion came null or empty.");
+                }
+            }
+            catch (JsonException ex) {
+                throw new Exception($"Failed to parse response JSON: {ex.Message}", ex);
+            }
+            catch (Exception ex) {
+                throw new Exception($"PATCH failed to edit task: {ex.Message}", ex);
+            }
+        }
+
+        #region Private (for pagination)
+        private async Task<(List<MotionWorkspace> Workspaces, string? Cursor)> FetchWorkspacesPageAsync(string? cursor = null)
+        {
+            var queryParams = new Dictionary<string, string>();
+
+            if (!string.IsNullOrEmpty(cursor)) {
+                queryParams["cursor"] = cursor;
+            }
+
+            try {
+                // Attempt to make the HTTP request
+                var (isSuccess, responseContent) = await MakeRequestAsync("workspaces", HttpMethod.Get, queryParams);
+
+                if (string.IsNullOrEmpty(responseContent)) {
+                    throw new Exception("Response content is null or empty.");
+                }
+
+                if (!isSuccess) {
+                    HandleErrorResponse(responseContent);
+                }
+
+                // Parse the successful response
+                var workspacesResponse = JsonSerializer.Deserialize<MotionWorkspacesResponse>(responseContent);
+
+                if (workspacesResponse == null) {
+                    throw new Exception("Response JSON does not match the expected format.");
+                }
+
+                return (workspacesResponse.Workspaces, workspacesResponse.Cursor);
+            }
+            catch (JsonException ex) {
+                throw new Exception($"Failed to parse response JSON: {ex.Message}", ex);
+            }
+            catch (Exception ex) {
+                throw new Exception($"Failed to fetch workspaces page: {ex.Message}", ex);
+            }
+        }
+
+        private async Task<(List<MotionProject> Projects, string? Cursor)> FetchProjectsPageAsync(string workspaceId, string? cursor = null)
+        {
+            var queryParams = new Dictionary<string, string> {
+                ["workspaceId"] = workspaceId
+            };
+
+            if (!string.IsNullOrEmpty(cursor)) {
+                queryParams["cursor"] = cursor;
+            }
+
+            try {
+                // Attempt to make the HTTP request
+                var (isSuccess, responseContent) = await MakeRequestAsync("projects", HttpMethod.Get, queryParams);
+
+                if (string.IsNullOrEmpty(responseContent)) {
+                    throw new Exception("Response content is null or empty.");
+                }
+
+                if (!isSuccess) {
+                    HandleErrorResponse(responseContent);
+                }
+
+                // Parse the successful response
+                var projectsResponse = JsonSerializer.Deserialize<MotionProjectsResponse>(responseContent);
+
+                if (projectsResponse == null) {
+                    throw new Exception("Response JSON does not match the expected format.");
+                }
+
+                return (projectsResponse.Projects, projectsResponse.Cursor);
+            }
+            catch (JsonException ex) {
+                throw new Exception($"Failed to parse response JSON: {ex.Message}", ex);
+            }
+            catch (Exception ex) {
+                throw new Exception($"Failed to fetch projects page: {ex.Message}", ex);
+            }
+        }
+
+        private async Task<(List<MotionTask> Tasks, string? Cursor)> FetchTasksPageAsync(string? cursor = null)
+        {
+            var queryParams = new Dictionary<string, string>();
+
+            if (!string.IsNullOrEmpty(cursor)) {
+                queryParams["cursor"] = cursor;
+            }
+
+            try {
+                // Attempt to make the HTTP request
+                var (isSuccess, responseContent) = await MakeRequestAsync("tasks", HttpMethod.Get, queryParams);
+
+                if (string.IsNullOrEmpty(responseContent)) {
+                    throw new Exception("Response content is null or empty.");
+                }
+
+                if (!isSuccess) {
+                    HandleErrorResponse(responseContent);
+                }
+
+                // Parse the successful response
+                var tasksResponse = JsonSerializer.Deserialize<MotionTasksResponse>(responseContent);
+
+                if (tasksResponse == null) {
+                    throw new Exception("Response JSON does not match the expected format.");
+                }
+
+                return (tasksResponse.Tasks, tasksResponse.Cursor);
+            }
+            catch (JsonException ex) {
+                throw new Exception($"Failed to parse response JSON: {ex.Message}", ex);
+            }
+            catch (Exception ex) {
+                throw new Exception($"Failed to fetch tasks page: {ex.Message}", ex);
+            }
+        }
+        #endregion
+
         #region Private
         private MotionHelper()
         {
@@ -129,175 +351,89 @@ namespace Ordo.Api
             }
         }
 
-        private async Task<(List<MotionWorkspace> Workspaces, string? Cursor)> FetchWorkspacesPageAsync(string? cursor = null)
+        private async Task<(bool IsSuccess, string Content)> MakeRequestAsync(string endpoint, HttpMethod httpMethod, Dictionary<string, string>? queryParams = null, object? payload = null)
         {
-            var queryParams = new Dictionary<string, string>();
+            if (string.IsNullOrWhiteSpace(endpoint))
+                throw new ArgumentException("Endpoint cannot be null or empty", nameof(endpoint));
 
-            if (!string.IsNullOrEmpty(cursor)) {
-                queryParams["cursor"] = cursor;
-            }
-
-            var (isSuccess, responseContent) = await MakeRequestAsync("workspaces", HttpMethod.Get, queryParams);
-
-            if (!isSuccess) {
-                try {
-                    // Parse the error response
-                    var errorResponse = System.Text.Json.JsonSerializer.Deserialize<MotionErrorResponse>(responseContent);
-
-                    if (errorResponse == null || string.IsNullOrEmpty(errorResponse.Message) ||
-                        string.IsNullOrEmpty(errorResponse.Error) || errorResponse.StatusCode == 0) {
-                        throw new Exception("Response JSON does not match the expected format.");
-                    }
-
-                    throw new Exception($"{errorResponse.StatusCode} {errorResponse.Error} ({errorResponse.Message})");
-                }
-                catch (System.Text.Json.JsonException ex) {
-                    throw new Exception($"Failed to parse error response JSON: {ex.Message}", ex);
+            // Handle rate-limiting
+            lock (_lock) {
+                _requestCounter++;
+                if (_requestCounter >= 10) {
+                    _requestCounter = 0; // Reset the counter
+                    Console.WriteLine("Rate limit reached. Pausing for 1 minute.");
                 }
             }
 
-            try {
-                // Parse the workspaces response
-                var workspacesResponse = System.Text.Json.JsonSerializer.Deserialize<MotionWorkspacesResponse>(responseContent);
-
-                if (workspacesResponse == null) {
-                    throw new Exception("Response JSON does not match the expected format.");
-                }
-
-                return (workspacesResponse.Workspaces, workspacesResponse.Cursor);
-            }
-            catch (System.Text.Json.JsonException ex) {
-                throw new Exception($"Failed to parse workspaces response JSON: {ex.Message}", ex);
-            }
-        }
-
-        private async Task<(List<MotionProject> Projects, string? Cursor)> FetchProjectsPageAsync(string workspaceId, string? cursor = null)
-        {
-            var queryParams = new Dictionary<string, string>();
-
-           queryParams["workspaceId"] = workspaceId;
-
-            if (!string.IsNullOrEmpty(cursor)) {
-                queryParams["cursor"] = cursor;
+            if (_requestCounter == 0) {
+                await Task.Delay(TimeSpan.FromMinutes(1));
             }
 
-            var (isSuccess, responseContent) = await MakeRequestAsync("projects", HttpMethod.Get, queryParams);
-
-            if (!isSuccess) {
-                try {
-                    // Parse the error response
-                    var errorResponse = System.Text.Json.JsonSerializer.Deserialize<MotionErrorResponse>(responseContent);
-
-                    if (errorResponse == null || string.IsNullOrEmpty(errorResponse.Message) ||
-                        string.IsNullOrEmpty(errorResponse.Error) || errorResponse.StatusCode == 0) {
-                        throw new Exception("Response JSON does not match the expected format.");
-                    }
-
-                    throw new Exception($"{errorResponse.StatusCode} {errorResponse.Error} ({errorResponse.Message})");
-                }
-                catch (System.Text.Json.JsonException ex) {
-                    throw new Exception($"Failed to parse error response JSON: {ex.Message}", ex);
-                }
-            }
-
-            try {
-                // Parse the projects response
-                var projectsResponse = System.Text.Json.JsonSerializer.Deserialize<MotionProjectsResponse>(responseContent);
-
-                if (projectsResponse == null) {
-                    throw new Exception("Response JSON does not match the expected format.");
-                }
-
-                return (projectsResponse.Projects, projectsResponse.Cursor);
-            }
-            catch (System.Text.Json.JsonException ex) {
-                throw new Exception($"Failed to parse projects response JSON: {ex.Message}", ex);
-            }
-        }
-
-        private async Task<(List<MotionTask> Tasks, string? Cursor)> FetchTasksPageAsync(string? cursor = null)
-        {
-            var queryParams = new Dictionary<string, string>();
-
-            if (!string.IsNullOrEmpty(cursor)) {
-                queryParams["cursor"] = cursor;
-            }
-
-            var (isSuccess, responseContent) = await MakeRequestAsync("tasks", HttpMethod.Get, queryParams);
-
-            if (!isSuccess) {
-                try {
-                    // Parse the error response
-                    var errorResponse = System.Text.Json.JsonSerializer.Deserialize<MotionErrorResponse>(responseContent);
-
-                    if (errorResponse == null || string.IsNullOrEmpty(errorResponse.Message) ||
-                        string.IsNullOrEmpty(errorResponse.Error) || errorResponse.StatusCode == 0) {
-                        throw new Exception("Response JSON does not match the expected format.");
-                    }
-
-                    throw new Exception($"{errorResponse.StatusCode} {errorResponse.Error} ({errorResponse.Message})");
-                }
-                catch (System.Text.Json.JsonException ex) {
-                    throw new Exception($"Failed to parse error response JSON: {ex.Message}", ex);
-                }
-            }
-
-            try {
-                // Parse the tasks response
-                var tasksResponse = System.Text.Json.JsonSerializer.Deserialize<MotionTasksResponse>(responseContent);
-
-                if (tasksResponse == null) {
-                    throw new Exception("Response JSON does not match the expected format.");
-                }
-
-                return (tasksResponse.Tasks, tasksResponse.Cursor);
-            }
-            catch (System.Text.Json.JsonException ex) {
-                throw new Exception($"Failed to parse tasks response JSON: {ex.Message}", ex);
-            }
-        }
-
-        /*private string? ExtractCursorFromResponse(string jsonResponse)
-        {
-            var jsonDocument = System.Text.Json.JsonDocument.Parse(jsonResponse);
-            if (jsonDocument.RootElement.TryGetProperty("cursor", out var cursorElement)) {
-                return cursorElement.GetString();
-            }
-
-            return null;
-        }*/
-
-        private async Task<(bool IsSuccess, string Content)> MakeRequestAsync(string endpoint, HttpMethod httpMethod, Dictionary<string, string> queryParams)
-        {
             using var httpClient = new HttpClient();
 
             httpClient.DefaultRequestHeaders.Add("X-API-Key", _apiKey);
             httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
 
+            // Build the URL with query parameters if provided
             var url = new StringBuilder($"{BaseUrl}/{endpoint}");
-            if (queryParams.Count > 0) {
+            if (queryParams != null && queryParams.Count > 0) {
                 url.Append("?");
                 foreach (var param in queryParams) {
                     url.AppendFormat("{0}={1}&", param.Key, Uri.EscapeDataString(param.Value));
                 }
-                url.Length--;
+                url.Length--; // Remove trailing "&"
             }
 
-            var request = new HttpRequestMessage(httpMethod, url.ToString());
-
             try {
+                var request = new HttpRequestMessage(httpMethod, url.ToString());
+
+                // Add payload for methods like POST or PUT
+                if (payload != null && (httpMethod == HttpMethod.Post || httpMethod == HttpMethod.Put || httpMethod == HttpMethod.Patch)) {
+                    var jsonPayload = JsonSerializer.Serialize(payload);
+                    request.Content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
+                }
+
                 var response = await httpClient.SendAsync(request);
                 var content = await response.Content.ReadAsStringAsync();
 
                 return (response.IsSuccessStatusCode, content);
             }
+            catch (TaskCanceledException ex) {
+                throw new TimeoutException("The request timed out.", ex);
+            }
             catch (HttpRequestException ex) {
-                Logger.Instance.Log(LogLevel.ERROR, $"[ERROR] HTTP Request failed: {ex.Message}");
-                throw;
+                throw new HttpRequestException($"HTTP request failed: {ex.Message}", ex);
             }
             catch (Exception ex) {
-                Logger.Instance.Log(LogLevel.ERROR, $"[ERROR] An unexpected error occurred: {ex.Message}");
-                throw;
+                throw new Exception($"An unexpected error occurred: {ex.Message}", ex);
+            }
+        }
+
+        private void HandleErrorResponse(string responseContent)
+        {
+
+            try {
+                var errorResponse = JsonSerializer.Deserialize<MotionErrorResponse>(responseContent);
+
+                if (errorResponse == null || string.IsNullOrEmpty(errorResponse.Message) || errorResponse.StatusCode == 0) {
+                    throw new Exception("Response JSON does not match the expected error format.");
+                }
+
+                throw new Exception($"{errorResponse.StatusCode} {errorResponse.Error} ({errorResponse.Message})");
+            }
+            catch (JsonException) { }
+
+            try {
+                var errorResponse = JsonSerializer.Deserialize<MotionErrorResponse2>(responseContent);
+
+                if (errorResponse == null || string.IsNullOrEmpty(errorResponse.Message[0]) || errorResponse.StatusCode == 0) {
+                    throw new Exception("Response JSON does not match the expected error format.");
+                }
+
+                throw new Exception($"{errorResponse.StatusCode} {errorResponse.Error} ({errorResponse.Message[0]})");
+            }
+            catch (JsonException ex) {
+                throw new Exception($"Failed to parse error response JSON: {ex.Message}", ex);
             }
         }
         #endregion

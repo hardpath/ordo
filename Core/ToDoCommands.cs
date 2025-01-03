@@ -15,12 +15,10 @@ namespace ordo.Core
             try
             {
                 // Get LISTS
-                Logger.Instance.Log(LogLevel.DEBUG, "... Lists...");
 
                 List<TodoList> lists = await GraphClientHelper.Instance.GetListsAsync();
 
                 // Get TASKS
-                Logger.Instance.Log(LogLevel.DEBUG, "... Tasks...");
                 bool abort = false;
                 foreach (var list in lists)
                 {
@@ -37,8 +35,6 @@ namespace ordo.Core
                         if (string.IsNullOrEmpty(task.DueDateTime.DateTime)) { continue; }
                         if (string.IsNullOrEmpty(task.DueDateTime.TimeZone)) { continue; }
                         if (task.Status == "completed") { continue; }
-
-                        Logger.Instance.Log(LogLevel.DEBUG, $"Task '{list.DisplayName}': '{task.Title}'");
 
                         if (task.DueDateTime.GetUtcTime().Date < DateTime.Now.ToUniversalTime().Date)
                         {

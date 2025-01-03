@@ -1,7 +1,7 @@
 ﻿{
   "AbortTodoOverdue": true,
   "AbortMotionZombie": true,
-  "Debug": false,
+  "Debug": true,
   "Refresh": 15,
   "Log": ""
 }
