@@ -17,6 +17,14 @@ namespace Ordo.Models
 
             return string.Empty;
         }
+    
+        public bool TaskExists(string taskId)
+        {
+            foreach(var task in Tasks) {
+                if (task.Id == taskId) return true;
+            }
+            return false;
+        }
     }
 
     public class TodoListsResponse

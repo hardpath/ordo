@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Graph.Models;
 using Ordo.Log;
 using Ordo.Models;
 using System.Text;
@@ -207,6 +208,23 @@ namespace Ordo.Api
             }
         }
 
+        public async Task DeleteTaskAsync(string taskId)
+        {
+            string endpoint = $"tasks/{taskId}";
+            try {
+                var (isSuccess, responseContent) = await MakeRequestAsync(endpoint, HttpMethod.Delete);
+
+                if (!isSuccess) {
+                    HandleErrorResponse(responseContent);
+                }
+            }
+            catch (JsonException ex) {
+                throw new Exception($"Failed to parse response JSON: {ex.Message}", ex);
+            }
+            catch (Exception ex) {
+                throw new Exception($"PATCH failed to edit task: {ex.Message}", ex);
+            }
+        }
         #region Private (for pagination)
         private async Task<(List<MotionWorkspace> Workspaces, string? Cursor)> FetchWorkspacesPageAsync(string? cursor = null)
         {

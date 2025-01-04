@@ -1,4 +1,5 @@
-﻿using Ordo.Api;
+﻿using Microsoft.VisualBasic;
+using Ordo.Api;
 using Ordo.Log;
 using Ordo.Models;
 
@@ -78,6 +79,18 @@ namespace ordo.Core
         {
             try {
                 await MotionHelper.Instance.EditTaskAsync(taskId, taskName, dueDate);
+                return false;
+            }
+            catch (Exception ex) {
+                Logger.Instance.Log(LogLevel.ERROR, $"{ex.Message}");
+                return true;
+            }
+        }
+
+        public static async Task<bool> DeleteTask(string taskId)
+        {
+            try {
+                await MotionHelper.Instance.DeleteTaskAsync(taskId);
                 return false;
             }
             catch (Exception ex) {

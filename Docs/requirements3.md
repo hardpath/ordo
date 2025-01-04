@@ -9,6 +9,7 @@
       - [x] If not in `ids.json`, create in Motion and add to `ids.json`.
       - [x] If in `ids.json`, update **Name** and **Due Date** in Motion
 - [ ] For each entry in `ids.json`,
+      - [x] If not in `todo.json`, delete from Motion.
       - [ ] If not in `motion.json`, mark as **Completed** in ToDo.
       - [ ] If not in `motion.json` and not in `todo.json`, delete from `ids.json`.
 

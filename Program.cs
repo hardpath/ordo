@@ -35,6 +35,8 @@ namespace Ordo
 
             if (await Todo2Motion()) return;
 
+            if (await DeleteMotionTasks()) return;
+
             Logger.Instance.Log(LogLevel.INFO, "Synchronisation completed.");
         }
 
@@ -272,6 +274,18 @@ namespace Ordo
             #endregion
 
             return false;
+        }
+
+        private static async Task<bool> DeleteMotionTasks()
+        {
+            foreach (var task in _idsData.Tasks) {
+                if (!_todoData.TaskExists(task.ToDoId)) {
+                    string task_name = _motionData.GetTasKName(task.MotionId);
+                    Logger.Instance.Log(LogLevel.INFO, $"Delete Motion task '{task_name}'.");
+                    await MotionCommands.DeleteTask(task.MotionId);
+                }
+            }
+            return true;
         }
 
         private static string GetWorkspaceName(string listName)

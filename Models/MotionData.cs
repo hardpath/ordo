@@ -28,6 +28,21 @@ namespace Ordo.Models
             }
             return false;
         }
+    
+        public bool TaskExists(string taskId) {
+            foreach (var task in Tasks) {
+                if (task.Id == taskId) return true;
+            }
+            return false;
+        }
+    
+        public string GetTasKName(string taskId)
+        {
+            foreach (var task in Tasks) {
+                if (task.Id == taskId) return task.Name;
+            }
+            return string.Empty;
+        }
     }
 
     public class MotionWorkspace
