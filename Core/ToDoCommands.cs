@@ -9,7 +9,7 @@ namespace ordo.Core
     {
         public static async Task<(bool, TodoData)> GetDataAsync(bool abortOverdue)
         {
-            Logger.Instance.Log(LogLevel.INFO, "Fetching tasks from Microsoft ToDo...");
+            Logger.Instance.Log(LogLevel.INFO, "Get data from Microsoft ToDo...");
 
             TodoData todoData = new TodoData();
             try
@@ -57,8 +57,20 @@ namespace ordo.Core
             }
             catch (Exception ex)
             {
-                Logger.Instance.Log(LogLevel.ERROR, $"An error occurred while fetching tasks; {ex.Message}");
+                Logger.Instance.Log(LogLevel.ERROR, $"Error occurred while fetching tasks; {ex.Message}");
                 return (true, todoData);
+            }
+        }
+    
+        public static async Task<bool> MarkAsCompletedAsync(string listId, string taskId)
+        {
+            try {
+                await GraphClientHelper.Instance.MarkAsCompletedAsync(listId, taskId);
+                return false;
+            }
+            catch (Exception ex) {
+                Logger.Instance.Log(LogLevel.ERROR, $"Error occurred while mark task as completed; {ex.Message}");
+                return true;
             }
         }
     }

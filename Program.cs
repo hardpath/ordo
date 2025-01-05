@@ -1,10 +1,13 @@
 ﻿
 using Microsoft.Extensions.Configuration;
+using Microsoft.Graph.Models;
 using ordo.Core;
 using Ordo.Core;
 using Ordo.Log;
 using Ordo.Models;
+using System;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace Ordo
 {
@@ -17,7 +20,7 @@ namespace Ordo
 
         static async Task Main(string[] args)
         {
-            Console.WriteLine("Welcome to Ordo, the ToDo-Motion Synchroniser");
+            Console.WriteLine("Ordo (v1.0 rc1)");
 
             Logger.Instance.SetLoggingStrategy(new ConsoleLoggingStrategy());
 
@@ -35,7 +38,7 @@ namespace Ordo
 
             if (await Todo2Motion()) return;
 
-            if (await DeleteMotionTasks()) return;
+            if (await DeleteTasks()) return;
 
             Logger.Instance.Log(LogLevel.INFO, "Synchronisation completed.");
         }
@@ -174,8 +177,10 @@ namespace Ordo
 
         private static async Task<bool> Todo2Motion()
         {
+            bool motion_changed = false;
+
             #region LISTS / PROJECTS
-            Logger.Instance.Log(LogLevel.INFO, "Sync ToDo Lists to Motion Projects...");
+            Logger.Instance.Log(LogLevel.INFO, "Sync Lists...");
             foreach (var list in _todoData.Lists) {
                 if (!_idsData.ListExistsInTodo(list.Id)) { // If the list does not exist in IdsData
                     // ADD LIST TO MOTION AS PROJECT
@@ -202,16 +207,14 @@ namespace Ordo
                     ids.ToDoId = list.Id;
                     ids.MotionId = project_id;
                     _idsData.Lists.Add(ids);
+
+                    motion_changed = true;
                 }
             }
-
-            JSONArchiver.Save("ids.json", _idsData);
-
-            Logger.Instance.Log(LogLevel.INFO, "ToDo Lists - Motion Projects synchronised.");
             #endregion
 
             #region TASKS
-            Logger.Instance.Log(LogLevel.INFO, "Sync Tasks with Motion ...");
+            Logger.Instance.Log(LogLevel.INFO, "Sync Tasks...");
 
             foreach (var task in _todoData.Tasks) {
                 if (!_idsData.TaskExistsInTodo(task.Id)) { // If the task does not exist in IdsData
@@ -246,7 +249,11 @@ namespace Ordo
                     }
 
                     // Add Task
-                    Logger.Instance.Log(LogLevel.DEBUG, $"Add task to Motion > {listName} - {task.Title}");
+                    Logger.Instance.Log(LogLevel.DEBUG, $"Add task '{listName} - {task.Title}' to Motion.");
+                    if (task.DueDateTime == null) {
+                        Logger.Instance.Log(LogLevel.ERROR, "DueDateTime cannot be null.");
+                        return true;
+                    }
                     string task_id = await MotionCommands.AddTaskAsync(task.Title, workspaceId, projectID, task.DueDateTime.GetUtcTime().ToString("yyyy-MM-ddTHH:mm:ss.fff"));
                     if (task_id == string.Empty) { return true; }
 
@@ -254,6 +261,8 @@ namespace Ordo
                     ids.ToDoId = task.Id;
                     ids.MotionId = task_id;
                     _idsData.Tasks.Add(ids);
+
+                    motion_changed = true;
                 }
                 else { // If the task exists in IdsData
                     // EDIT TASK IN MOTION
@@ -261,6 +270,10 @@ namespace Ordo
                     // Get Project ID
                     string task_id = _idsData.GetTaskID(task.Id);
 
+                    if (task.DueDateTime == null) {
+                        Logger.Instance.Log(LogLevel.ERROR, "DueDateTime cannot be null.");
+                        return true;
+                    }
                     if (!_motionData.TaskHasChanged(task_id, task.Title, task.DueDateTime.GetUtcTime()))
                         continue;
 
@@ -269,23 +282,69 @@ namespace Ordo
                     if (await MotionCommands.EditTaskAsync(task_id, task.Title, task.DueDateTime.GetUtcTime().ToString("yyyy-MM-ddTHH:mm:ss.fff"))) return true;
                 }
             }
+            #endregion
 
             JSONArchiver.Save("ids.json", _idsData);
-            #endregion
+
+            if (motion_changed) {
+                await GetMotionData();
+            }
 
             return false;
         }
 
-        private static async Task<bool> DeleteMotionTasks()
+        private static async Task<bool> DeleteTasks()
         {
+            List<string> tasks_to_del_motion = new List<string>();
+            List<string> tasks_to_del_todo = new List<string>();
+
+            //TODO 1 - Try-catch missing
+
+            // For each entry in `ids.json` if not in `todo.json`, delete from Motion.
             foreach (var task in _idsData.Tasks) {
                 if (!_todoData.TaskExists(task.ToDoId)) {
-                    string task_name = _motionData.GetTasKName(task.MotionId);
-                    Logger.Instance.Log(LogLevel.INFO, $"Delete Motion task '{task_name}'.");
-                    await MotionCommands.DeleteTask(task.MotionId);
+                    tasks_to_del_motion.Add(task.MotionId);
                 }
             }
-            return true;
+
+            // For each entry in `ids.json` if not in `motion.json`, mark as Completed in ToDo.
+            foreach (var task in _idsData.Tasks) {
+                if (!_motionData.TaskExists(task.MotionId)) {
+                    tasks_to_del_todo.Add(task.ToDoId);
+                }
+            }
+
+            // Delete tasks in Motion
+            foreach (string task_id in tasks_to_del_motion) {
+                string task_name = _motionData.GetTasKName(task_id);
+                Logger.Instance.Log(LogLevel.DEBUG, $"Delete Motion task '{task_name}'.");
+
+                await MotionCommands.DeleteTask(task_id);
+
+                if (_idsData.DeleteTaskPair(null, task_id)) {
+                    Logger.Instance.Log(LogLevel.ERROR, "Failed to removed entry from ids.json.");
+                    return true;
+                }
+            }
+
+            // Mark tasks as completed in ToDo
+            foreach (string task_id in tasks_to_del_todo) {
+                string task_name = _todoData.GetTaskName(task_id);
+                Logger.Instance.Log(LogLevel.DEBUG, $"Mark task '{task_name}' as completed in ToDo.");
+
+                string list_id = _todoData.GetListId(task_id);
+
+                await ToDoCommands.MarkAsCompletedAsync(list_id, task_id);
+
+                if (_idsData.DeleteTaskPair(task_id, null)) {
+                    Logger.Instance.Log(LogLevel.ERROR, "Failed to removed entry from ids.json.");
+                    return true;
+                }
+            }
+
+            JSONArchiver.Save("ids.json", _idsData);
+
+            return false;
         }
 
         private static string GetWorkspaceName(string listName)

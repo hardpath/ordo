@@ -1,6 +1,4 @@
 ﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Graph.Models;
-using Ordo.Log;
 using Ordo.Models;
 using System.Text;
 using System.Text.Json;
@@ -12,7 +10,7 @@ namespace Ordo.Api
         private static MotionHelper? _instance;
         private static readonly object _lock = new object();
         private readonly string _apiKey;
-        private const string BaseUrl = "https://api.usemotion.com/v1";
+        private const string _baseUrl = "https://api.usemotion.com/v1";
         private static int _requestCounter = 0; // Static to track across method calls
 
         public static MotionHelper Instance
@@ -225,6 +223,7 @@ namespace Ordo.Api
                 throw new Exception($"PATCH failed to edit task: {ex.Message}", ex);
             }
         }
+        
         #region Private (for pagination)
         private async Task<(List<MotionWorkspace> Workspaces, string? Cursor)> FetchWorkspacesPageAsync(string? cursor = null)
         {
@@ -393,7 +392,7 @@ namespace Ordo.Api
             httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
 
             // Build the URL with query parameters if provided
-            var url = new StringBuilder($"{BaseUrl}/{endpoint}");
+            var url = new StringBuilder($"{_baseUrl}/{endpoint}");
             if (queryParams != null && queryParams.Count > 0) {
                 url.Append("?");
                 foreach (var param in queryParams) {

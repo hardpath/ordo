@@ -64,6 +64,43 @@ namespace Ordo.Models
 
             return string.Empty;
         }
+
+        public bool DeleteTaskPair(string? toDoId = null, string? motionId = null)
+        {
+            if (toDoId == null && motionId == null) {
+                return true; // Invalid arguments
+            }
+
+            IdPair? taskToRemove = null;
+
+            // Iterate through the Tasks list to find the first matching pair
+            foreach (var task in Tasks) {
+                bool matchesToDoId = false;
+                if (toDoId == null)
+                    matchesToDoId = true;
+                else if (task.ToDoId == toDoId)
+                    matchesToDoId = true;
+
+                bool matchesMotionId = false;
+                if (motionId == null)
+                    matchesMotionId = true;
+                else if (task.MotionId == motionId)
+                    matchesMotionId = true;
+
+                if (matchesToDoId && matchesMotionId) {
+                    taskToRemove = task;
+                    break;
+                }
+            }
+
+            // Remove the matching task if found
+            if (taskToRemove != null) {
+                Tasks.Remove(taskToRemove);
+                return false;
+            }
+
+            return true; // Pair not found
+        }
     }
 
     public class IdPair

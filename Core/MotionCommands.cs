@@ -9,7 +9,7 @@ namespace ordo.Core
     {
         public static async Task<(bool, MotionData)> GetDataAsync()
         {
-            Logger.Instance.Log(LogLevel.INFO, "Retrieving Motion data...");
+            Logger.Instance.Log(LogLevel.INFO, "Get data from Motion...");
 
             MotionData motionData = new MotionData();
             try

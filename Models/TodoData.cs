@@ -17,13 +17,30 @@ namespace Ordo.Models
 
             return string.Empty;
         }
-    
+
+        public string GetListId(string taskID)
+        {
+            foreach (var task in Tasks) {
+                if (task.Id == taskID) return task.ListId;
+            }
+
+            return string.Empty;
+        }
+
         public bool TaskExists(string taskId)
         {
             foreach(var task in Tasks) {
                 if (task.Id == taskId) return true;
             }
             return false;
+        }
+
+        public string GetTaskName(string taskId)
+        {
+            foreach (var task in Tasks) {
+                if (task.Id == taskId) return task.Title;
+            }
+            return string.Empty;
         }
     }
 
@@ -93,4 +110,36 @@ namespace Ordo.Models
             }
         }
     }
+
+    // Error response
+    public class GraphErrorResponse
+    {
+        [JsonPropertyName("error")]
+        public GraphErrorDetail Error { get; set; } = new GraphErrorDetail();
+    }
+
+    public class GraphErrorDetail
+    {
+        [JsonPropertyName("code")]
+        public string Code { get; set; } = string.Empty;
+
+        [JsonPropertyName("message")]
+        public string Message { get; set; } = string.Empty;
+
+        [JsonPropertyName("innerError")]
+        public GraphInnerErrorDetail InnerError { get; set; } = new GraphInnerErrorDetail();
+    }
+
+    public class GraphInnerErrorDetail
+    {
+        [JsonPropertyName("date")]
+        public string Date { get; set; } = string.Empty;
+
+        [JsonPropertyName("request-id")]
+        public string RequestId { get; set; } = string.Empty; // Mapped to "request-id"
+
+        [JsonPropertyName("client-request-id")]
+        public string ClientRequestId { get; set; } = string.Empty; // Mapped to "client-request-id"
+    }
+
 }
