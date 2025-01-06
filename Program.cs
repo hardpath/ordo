@@ -20,7 +20,7 @@ namespace Ordo
 
         static async Task Main(string[] args)
         {
-            Console.WriteLine("Ordo (v1.0 rc1)");
+            Console.WriteLine("Ordo (v1.0 rc2)");
 
             Logger.Instance.SetLoggingStrategy(new ConsoleLoggingStrategy());
 
